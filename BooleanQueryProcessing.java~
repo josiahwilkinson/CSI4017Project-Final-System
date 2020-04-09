@@ -313,11 +313,9 @@ class BooleanQueryProcessing {
   
   
   
-  //  rewrite with bigram indexing
   
   //  wildcard management
   static void wildcard(QueryNode node) {
-    /*
     //  AND or OR node
     //  if (node.type != -1) {
       //  call function on children
@@ -426,7 +424,6 @@ class BooleanQueryProcessing {
         }
       }
     }
-    */
   }
   
   

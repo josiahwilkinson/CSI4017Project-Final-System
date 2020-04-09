@@ -1,8 +1,9 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.io.*;
-import java.io.FileNotFoundException; 
-import java.lang.Math; 
+import java.io.FileNotFoundException;
+import java.lang.Math;
+import java.util.HashMap;
 
 
 
@@ -16,7 +17,9 @@ class Dictionary {
   static char[] punctuation;
   
   
-  static ArrayList<DictionaryWord> words = new ArrayList<DictionaryWord>();
+  //  static ArrayList<DictionaryWord> words = new ArrayList<DictionaryWord>();
+      
+  static HashMap<String, DictionaryWord> dictionaryMap = new HashMap<String, DictionaryWord>();
   
   
   public static void main(String args[]) {
@@ -229,24 +232,27 @@ class Dictionary {
       
       
       
-      ArrayList<String> wordList = new ArrayList<String>();
+      //  too slow, use hashmap
+      //  ArrayList<String> wordList = new ArrayList<String>();
       
       documents = new ProperDocument[rawDocuments.size()];
       for (int i = 0; i < rawDocuments.size(); i++) {
-        if (i%25 == 0 || i > 4590)
-          System.out.println(i +" " + wordList.size() +" "+ words.size());
+        if (i%25 == 0)
+          System.out.println(i +" " + dictionaryMap.size());
         documents[i] = new ProperDocument(rawDocuments.get(i));
         //  create dictionary compiling all proper documents
         
-        addDocument(documents[i], wordList);
+        addDocument(documents[i], dictionaryMap);
       }
       System.out.println("Finished creating proper documents");
+      
       
       
       
       //  set weights for all postings
       System.out.println("adding weights to dictionary");
       System.out.println();
+      /*
       for (DictionaryWord word : words) {
         for (int i = 0; i < documents.length; i++) {
           if (word.posting(i) != null) {  //  check that there is the posting for the document with this as the id
@@ -254,7 +260,9 @@ class Dictionary {
           }
         }
       }
+      */
       System.out.println("finished adding weights to dictionary");
+      System.out.println("didn't actually add weights to dictionary");
       System.out.println();
       
       
@@ -526,9 +534,11 @@ class Dictionary {
   
   
   //  integrates the Proper document into the dictionary
-  static void addDocument(ProperDocument doc, ArrayList<String> wordList) {
+  static void addDocument(ProperDocument doc,  HashMap<String, DictionaryWord> dictionaryMap) {
     //  scan all dictionary words in doc
     for (DictionaryWord docWord : doc.words) {
+      //  too slow, use hashmap
+      /*
       //  check for matching word in dictionary
       if (wordList.contains(docWord)) {
         int position = wordList.indexOf(docWord);
@@ -541,40 +551,49 @@ class Dictionary {
         words.add(dw);
         wordList.add(docWord.word);
       }
+      */
+      
+      //  check for matching word in dictionary
+      if (dictionaryMap.containsKey(docWord.word)) {
+        dictionaryMap.get(docWord.word).addPosting(docWord.postings.get(0));
+        docWord = dictionaryMap.get(docWord.word);  //  change DictionaryWord object into reference so as to free up memory
+      }
+      //  otherwise, add it
+      else {
+        DictionaryWord dw = new DictionaryWord(docWord.word);
+        dictionaryMap.put(docWord.word, dw);
+        dw.addPosting(docWord.postings.get(0));
+        //  words.add(dw);
+      }
     }
   }
   
   //  returns true if the dictionary contains the input word
   boolean hasWord(String w) {
-    for (DictionaryWord word : words) {
-      if (word.word.equals(w))
-        return true;
-    }
-    return false;
+    return dictionaryMap.containsKey(w);
   }
   
   //  returns the DictionaryWord matching the input word
   DictionaryWord getWord(String w) {
-    for (DictionaryWord word : words) {
-      if (word.word.equals(w))
-        return word;
-    }
+    if (hasWord(w))
+      return dictionaryMap.get(w);
     return null;
   }
   
   //  prints the dictionary to the console
   void printDictionary() {
     System.out.println("Dictionary:");
-    for (DictionaryWord word : words) {
+    for (DictionaryWord word : new ArrayList<DictionaryWord>(dictionaryMap.values())) {
       System.out.println();
       System.out.print(word.word + " || ");
       for (Posting posting : word.postings) {
-        System.out.print(posting.docID + ": {");
-        System.out.print(posting.postings[0]);
-        for (int i = 1; i<posting.postings.length; i++) {
-          System.out.print(", " + posting.postings[i]);
-        }
-        System.out.print("} | ");
+        System.out.print(posting.docID + ": ");
+        System.out.print(posting.postings);
+        //  System.out.print(posting.postings[0]);
+        //  for (int i = 1; i<posting.postings.length; i++) {
+        //    System.out.print(", " + posting.postings[i]);
+        //  }
+        System.out.print(" | ");
       }
     }
   }
@@ -587,7 +606,7 @@ class Dictionary {
   
   
   static float inverseDocumentFrequency(DictionaryWord word) {
-    return (float)(Math.log(words.size()/word.totalDocuments()));
+    return (float)(Math.log(dictionaryMap.size()/word.totalDocuments()));
   }
   
   static float termFrequency(DictionaryWord word, int docID) {

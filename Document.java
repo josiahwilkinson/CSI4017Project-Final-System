@@ -101,22 +101,33 @@ class ProperDocument {
     //  convert RawDocumentWord to Posting
     //  create single of each
     for (RawDocumentWord wordPosting : doc.words) {
-      words.add(new DictionaryWord(wordPosting.word));
-      int[] postings = {wordPosting.post};
-      words.get(words.size()-1).addPosting(new Posting(id, postings));
-    }
-    //  compound duplicates
-    for (int i = 0; i < words.size(); i++) {
-      for (int j = 0; j < words.size(); j++) {
-        if (i != j) {  //  don't do on same word
-          if (words.get(i).word.compareTo(words.get(j).word) == 0)  {  //  words are identical
-            //  add posting positing to former and remove later
-            words.get(i).postings.get(0).addPosting(words.get(j).postings.get(0).postings[0]);
-            words.remove(j);
-          }
+      boolean found = false;
+      for (DictionaryWord word : words) {
+        if (word.word.equals(wordPosting.word)) {
+          found = true;
+          word.postings.get(0).postings++;
         }
       }
+      if (!found) {
+        words.add(new DictionaryWord(wordPosting.word));
+        int[] postings = {wordPosting.post};
+        words.get(words.size()-1).addPosting(new Posting(id, postings));
+      }
     }
+    /*
+     //  compound duplicates
+     for (int i = 0; i < words.size(); i++) {
+     for (int j = 0; j < words.size(); j++) {
+     if (i != j) {  //  don't do on same word
+     if (words.get(i).word.compareTo(words.get(j).word) == 0)  {  //  words are identical
+     //  add posting positing to former and remove later
+     words.get(i).postings.get(0).addPosting(words.get(j).postings.get(0).postings);
+     words.remove(j);
+     }
+     }
+     }
+     }
+     */
   }
   
   //  prints the document to the console
@@ -126,12 +137,9 @@ class ProperDocument {
       System.out.println();
       System.out.print(word.word + " || ");
       for (Posting posting : word.postings) {
-        System.out.print(posting.docID + ": {");
-        System.out.print(posting.postings[0]);
-        for (int i = 1; i<posting.postings.length; i++) {
-          System.out.print(", " + posting.postings[i]);
-        }
-        System.out.print("} | ");
+        System.out.print(posting.docID + ": ");
+        System.out.print(posting.postings);
+        System.out.print(" | ");
       }
     }
   }

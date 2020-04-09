@@ -92,7 +92,7 @@ class Posting {
   }
   
   void addPosting() {
-    postings++;
+    posting++;
   }
   
   void setWeight(float w) {

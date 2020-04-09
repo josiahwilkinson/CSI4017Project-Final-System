@@ -19,7 +19,6 @@ public class SpellCorrector {
   public ArrayList<String> getSuggestions(String word){
     //set min editdistance to compare 
     
-    /*
     int initial=editDistDP(word,dict.words.get(0).word,word.length(),dict.words.get(0).word.length());
     
     //runs through dictionary to get suggestions
@@ -44,8 +43,6 @@ public class SpellCorrector {
     }
     System.out.println(suggestions.toString());
     return suggestions; 
-    */
-    return null;
   }
   
   
@@ -53,7 +50,7 @@ public class SpellCorrector {
   
   
   public boolean inDictionary(String word){
-    for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.dictionaryMap.values())) {
+    for(DictionaryWord w: dict.words) {
       if(w.word.equals(word)){
          return true;
     
