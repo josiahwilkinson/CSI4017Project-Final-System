@@ -54,15 +54,12 @@ class Dictionary {
         
         BufferedReader br = new BufferedReader(new FileReader(classes));
         String line = br.readLine();  //  get first line
+        //  casefold line
+        String originalLine = line;  //  copy to preserve capitals
+        line = line.toLowerCase();
         
         int lineCounter = 0;
         while (line != null) {
-          
-          //  casefold line
-          String originalLine = line;  //  copy to preserve capitals
-          line = line.toLowerCase();
-          lineCounter++;
-          
           //  if (i == 2)
           //  System.out.println(i + " " + lineCounter + " " + rawDocuments.size());
           //  System.out.println(line);
@@ -75,12 +72,11 @@ class Dictionary {
                 //  get id
                 String[] parts = originalLine.split("NEWID=");
                 int id = Integer.parseInt(parts[1].substring(1, parts[1].length()-2));
+            System.out.println("document: " + id);
+            System.out.println("correct length: " + (id == rawDocuments.size()));
                 
                 rawDocuments.add(new RawDocument(id));
                 currentDocument = rawDocuments.get(rawDocuments.size()-1);
-                
-                //  System.out.println("document: " + id +" "+rawDocuments.size());
-                //  System.out.println("correct length: " + (id == rawDocuments.size()));
               }
             }
             
@@ -92,7 +88,6 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<DATE>")) {
                   currentDocument.addDate(originalLine.substring(6, originalLine.length()-7));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(6, originalLine.length()-7)));
                 }
               }
               
@@ -100,7 +95,6 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<TOPIC")) {
                   currentDocument.addDate(originalLine.substring(8, originalLine.length()-9));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
               }
               
@@ -108,7 +102,6 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<PLACE")) {
                   currentDocument.addDate(originalLine.substring(8, originalLine.length()-9));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
               }
               
@@ -116,7 +109,6 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<PEOPL")) {
                   currentDocument.addDate(originalLine.substring(8, originalLine.length()-9));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
               }
               
@@ -124,7 +116,6 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 5).equals("<ORGS>")) {
                   currentDocument.addDate(originalLine.substring(6, originalLine.length()-7));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(6, originalLine.length()-7)));
                 }
               }
               
@@ -132,7 +123,6 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<EXCHA")) {
                   currentDocument.addDate(originalLine.substring(11, originalLine.length()-12));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(11, originalLine.length()-12)));
                 }
               }
               
@@ -140,7 +130,6 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<COMPA")) {
                   currentDocument.addDate(originalLine.substring(11, originalLine.length()-12));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(11, originalLine.length()-12)));
                 }
               }
               
@@ -178,7 +167,6 @@ class Dictionary {
                     }
                   }
                   currentDocument.addDateLine(dateLine);
-                  currentDocument.addWords(RawDocumentWordsFromLine(dateLine));
                   
                   //  get text body
                   //  first line
@@ -190,14 +178,9 @@ class Dictionary {
                   line = line.toLowerCase();
                   lineCounter++;
                   
-                  //  offset counter for word postings
-                  int offset = 0;
-                  while(!originalLine.equals("</REUTERS>")) {
+                  while(!originalLine.equals(" Reuter")) {
                     if (!line.equals("")) {
                       currentDocument.addLine(originalLine);
-                      ArrayList<RawDocumentWord> words = RawDocumentWordsFromLine(line, offset);
-                      offset += words.size();
-                      currentDocument.addWords(words);
                     }
                     line = br.readLine();
                     //  casefold line
@@ -205,60 +188,47 @@ class Dictionary {
                     line = line.toLowerCase();
                     lineCounter++;
                   }
-                  //  at this point, "</REUTERS>" has been reached, ending the document
+                  //  at this point, " Reuter" has been reached, ending the document
                   currentDocument = null;
                 }
               }
             }
+            
+            /*
+             * example document:</REUTERS>
+             <REUTERS TOPICS="NO" LEWISSPLIT="TRAIN" CGISPLIT="TRAINING-SET" OLDID="5546" NEWID="3">
+             <DATE>26-FEB-1987 15:03:27.51</DATE>
+             <TOPICS></TOPICS>
+             <PLACES><D>usa</D></PLACES>
+             <PEOPLE></PEOPLE>
+             <ORGS></ORGS>
+             <EXCHANGES></EXCHANGES>
+             <COMPANIES></COMPANIES>
+             <UNKNOWN> 
+             &#5;&#5;&#5;F A
+             &#22;&#22;&#1;f0714&#31;reute
+             d f BC-TEXAS-COMMERCE-BANCSH   02-26 0064</UNKNOWN>
+             <TEXT>&#2;
+             <TITLE>TEXAS COMMERCE BANCSHARES &lt;TCB> FILES PLAN</TITLE>
+             <DATELINE>    HOUSTON, Feb 26 - </DATELINE><BODY>Texas Commerce Bancshares Inc's Texas
+             Commerce Bank-Houston said it filed an application with the
+             Comptroller of the Currency in an effort to create the largest
+             banking network in Harris County.
+             The bank said the network would link 31 banks having
+             13.5 billion dlrs in assets and 7.5 billion dlrs in deposits.
+             
+             Reuter
+             */
           }
+          
           
           //  get next line
           line = br.readLine();
+          originalLine = line;
+          line = line.toLowerCase();
+          lineCounter++;
         }
       }
-      
-      
-      
-      System.out.println("Finished creating raw documents");
-      
-      
-      //  print out dictionary
-      System.out.println("Finished constructing dictionary");
-      System.out.println();
-      //  dictionary.printDictionary();
-      
-      
-      
-      ArrayList<String> wordList = new ArrayList<String>();
-      
-      documents = new ProperDocument[rawDocuments.size()];
-      for (int i = 0; i < rawDocuments.size(); i++) {
-        if (i%25 == 0 || i > 4590)
-          System.out.println(i +" " + wordList.size() +" "+ words.size());
-        documents[i] = new ProperDocument(rawDocuments.get(i));
-        //  create dictionary compiling all proper documents
-        
-        addDocument(documents[i], wordList);
-      }
-      System.out.println("Finished creating proper documents");
-      
-      
-      
-      //  set weights for all postings
-      System.out.println("adding weights to dictionary");
-      System.out.println();
-      for (DictionaryWord word : words) {
-        for (int i = 0; i < documents.length; i++) {
-          if (word.posting(i) != null) {  //  check that there is the posting for the document with this as the id
-            setWeight(word, i);
-          }
-        }
-      }
-      System.out.println("finished adding weights to dictionary");
-      System.out.println();
-      
-      
-      
       
       System.out.println("Did work");
     }
@@ -425,54 +395,6 @@ class Dictionary {
   }
   
   
-  
-  //  shortcut for non-body lines
-  static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line) {
-    //  System.out.println("HERE 1");
-    //  System.out.println(line);
-    return RawDocumentWordsFromLine(line, 0, false);
-  }
-  //  shortcut for body lines
-  static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line, int offset) {
-    //  System.out.println("HERE 2");
-    //  System.out.println(line);
-    return RawDocumentWordsFromLine(line, offset, true);
-  }
-  
-  //  returns an array of RawDocumentWord from the input line
-  static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line, int offset, boolean body) {  //  if the line is from the body, save postings; otherwise, save as -1 (not that postings are actually ever really used)
-    //  check if empty word
-    if (line.equals(""))
-      return null;
-    //  System.out.println("HERE 3");
-    String[] words = wordsFromLine(line);
-    //  System.out.println("HERE 4");
-    ArrayList<RawDocumentWord> rawWords = new ArrayList<RawDocumentWord>();
-    for (int i = 0; i < words.length; i++) {
-      if (!words[i].equals("") && !isNumber(words[i])) {
-        if (body)
-          rawWords.add(new RawDocumentWord(words[i], i+offset));
-        else
-          rawWords.add(new RawDocumentWord(words[i], -1));
-      }
-    }
-    //  System.out.println("HERE 5");
-    return rawWords;
-  }
-  
-  
-  //  takes a line of text and returns the words
-  static String[] wordsFromLine(String line) {
-    String[] words = line.split(" ");
-    for (int i = 0; i < words.length; i++) {
-      if (!words[i].equals("")) {
-        words[i] = cleanPunctuation(words[i]);
-      }
-    }
-    return words;
-  }
-  
-  
   //  cleans punctuation from a word
   static String cleanPunctuation(String s) {
     //  back
@@ -507,12 +429,12 @@ class Dictionary {
   
   //  function to check if the input string is a number
   static boolean isNumber(String s) {
-    char[] numbers = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'};
+    char[] numbers = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
     for (int i = 0; i < s.length(); i++) {
       Character c = new Character(s.charAt(i));
       boolean charIsNum = false;
       for (int n = 0; n < numbers.length; n++) {
-        if (c == numbers[n])
+        if (!(c.equals(new Character(numbers[n]))))
           charIsNum = true;
       }
       if (!charIsNum)
@@ -526,20 +448,23 @@ class Dictionary {
   
   
   //  integrates the Proper document into the dictionary
-  static void addDocument(ProperDocument doc, ArrayList<String> wordList) {
+  static void addDocument(ProperDocument doc) {
     //  scan all dictionary words in doc
     for (DictionaryWord docWord : doc.words) {
       //  check for matching word in dictionary
-      if (wordList.contains(docWord)) {
-        int position = wordList.indexOf(docWord);
-        words.get(position).addPosting(docWord.postings.get(0));
+      boolean foundMatch = false;
+      for (DictionaryWord dicWord : words) {
+        if (docWord.word.compareTo(dicWord.word) == 0) {
+          foundMatch = true;
+          //  add posting
+          dicWord.addPosting(docWord.postings.get(0));
+        }
       }
       //  if match could not be found, add (shallow copy of) word to dictionary
-      else {
+      if (!foundMatch) {
         DictionaryWord dw = new DictionaryWord(docWord.word);
         dw.addPosting(docWord.postings.get(0));  //  can do 0 as each document only has 1 posting (containing 1+ positions)
         words.add(dw);
-        wordList.add(docWord.word);
       }
     }
   }

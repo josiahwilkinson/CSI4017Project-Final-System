@@ -52,20 +52,12 @@ class RawDocument {
   }
   
   void addWords(ArrayList<RawDocumentWord> w) {
-    if (w != null) {
-      for (RawDocumentWord word : w) {
-        if (!word.word.equals(""))  //  check not an empty word
-          words.add(word);
-      }
-    }
+    for (RawDocumentWord word : w)
+      words.add(word);
   }
   void addWords(RawDocumentWord[] w) {
-    if (w != null) {
-      for (RawDocumentWord word : w) {
-        if (!word.word.equals(""))  //  check not an empty word
-          words.add(word);
-      }
-    }
+    for (RawDocumentWord word : w)
+      words.add(word);
   }
   void addLine(String line) {
     description = description + " " + line;

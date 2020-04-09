@@ -61,18 +61,15 @@ class VanillaSystem {
     System.out.println("Program test");
     
     //  should print empty line
-    //  System.out.println(("Program test").substring(0, 0));
+    System.out.println(("Program test").substring(0, 0));
     
-    //  booleanQueryProcessing.processQuery("test AND (this OR that)");
+    booleanQueryProcessing.processQuery("test AND (this OR that)");
     
     
     //  dictionary
-    System.out.println("creating dictionary");
     documents = dictionary.createDictionary(documents);
-    System.out.println("dictionary created");
     
     
-    /*
     //  testing time
     int[] results;
     results = booleanSearchWithQuery("effectively AND NOT baccalaureate");
@@ -93,7 +90,6 @@ class VanillaSystem {
     
     System.out.println(booleanSearchWithQuery("(query OR processing)").length);
     System.out.println(booleanSearchWithQuery("(query AND processing)").length);
-    */
   }
   
   
