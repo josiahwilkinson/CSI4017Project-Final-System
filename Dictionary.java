@@ -18,7 +18,7 @@ class Dictionary {
   
   
   //  static ArrayList<DictionaryWord> words = new ArrayList<DictionaryWord>();
-      
+  
   static HashMap<String, DictionaryWord> dictionaryMap = new HashMap<String, DictionaryWord>();
   
   
@@ -38,16 +38,20 @@ class Dictionary {
   public static ProperDocument[] createDictionary(ProperDocument[] documents) {
     
     
+    ArrayList<ProperDocument> documentList = new ArrayList<ProperDocument>();
     
     //  preprocessing
     try {
-      //  create arrayList of raw documents (word bags) to be made into a dictionary later
-      ArrayList<RawDocument> rawDocuments = new ArrayList<RawDocument>();
-      
-      RawDocument currentDocument = null;
       
       for (int i = 0; i < 22; i++) {
         System.out.println("Parsing file: " + i);
+        
+        
+        //  create arrayList of raw documents (word bags) to be made into a dictionary later
+        ArrayList<RawDocument> rawDocuments = new ArrayList<RawDocument>();
+        
+        RawDocument currentDocument = null;
+        
         
         File classes;
         if (i < 10)
@@ -216,49 +220,51 @@ class Dictionary {
           //  get next line
           line = br.readLine();
         }
-      }
-      
-      
-      
-      System.out.println("Finished creating raw documents");
-      
-      
-      //  print out dictionary
-      System.out.println("Finished constructing dictionary");
-      System.out.println();
-      //  dictionary.printDictionary();
-      
-      
-      
-      //  too slow, use hashmap
-      //  ArrayList<String> wordList = new ArrayList<String>();
-      
-      documents = new ProperDocument[rawDocuments.size()];
-      for (int i = 0; i < rawDocuments.size(); i++) {
-        if (i%25 == 0)
-          System.out.println(i +" " + dictionaryMap.size());
-        documents[i] = new ProperDocument(rawDocuments.get(i));
-        //  create dictionary compiling all proper documents
         
-        addDocument(documents[i], dictionaryMap);
+        
+        
+        System.out.println("Finished creating raw documents");
+        
+        
+        //  print out dictionary
+        System.out.println("Finished constructing dictionary");
+        System.out.println();
+        //  dictionary.printDictionary();
+        
+        
+        
+        //  too slow, use hashmap
+        //  ArrayList<String> wordList = new ArrayList<String>();
+        
+        //  documents = new ProperDocument[rawDocuments.size()];
+        
+        for (int j = 0; j < rawDocuments.size(); j++) {
+          if (j%25 == 0)
+            System.out.println(j + " " + documentList.size() + " " + dictionaryMap.size());
+          //  documents[j] = new ProperDocument(rawDocuments.get(j));
+          ProperDocument pd = new ProperDocument(rawDocuments.get(j));
+          documentList.add(pd);
+          //  create dictionary compiling all proper documents
+          addDocument(pd, dictionaryMap);
+        }
+        System.out.println("Finished creating proper documents");
+        
+        
       }
-      System.out.println("Finished creating proper documents");
-      
-      
       
       
       //  set weights for all postings
       System.out.println("adding weights to dictionary");
       System.out.println();
       /*
-      for (DictionaryWord word : words) {
-        for (int i = 0; i < documents.length; i++) {
-          if (word.posting(i) != null) {  //  check that there is the posting for the document with this as the id
-            setWeight(word, i);
-          }
-        }
-      }
-      */
+       for (DictionaryWord word : words) {
+       for (int i = 0; i < documents.length; i++) {
+       if (word.posting(i) != null) {  //  check that there is the posting for the document with this as the id
+       setWeight(word, i);
+       }
+       }
+       }
+       */
       System.out.println("finished adding weights to dictionary");
       System.out.println("didn't actually add weights to dictionary");
       System.out.println();
@@ -432,40 +438,40 @@ class Dictionary {
   
   
   /*
-  //  shortcut for non-body lines
-  static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line) {
-    //  System.out.println("HERE 1");
-    //  System.out.println(line);
-    return RawDocumentWordsFromLine(line, 0, false);
-  }
-  //  shortcut for body lines
-  static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line, int offset) {
-    //  System.out.println("HERE 2");
-    //  System.out.println(line);
-    return RawDocumentWordsFromLine(line, offset, true);
-  }
-  
-  //  returns an array of RawDocumentWord from the input line
-  static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line, int offset, boolean body) {  //  if the line is from the body, save postings; otherwise, save as -1 (not that postings are actually ever really used)
-    //  check if empty word
-    if (line.equals(""))
-      return null;
-    //  System.out.println("HERE 3");
-    String[] words = wordsFromLine(line);
-    //  System.out.println("HERE 4");
-    ArrayList<RawDocumentWord> rawWords = new ArrayList<RawDocumentWord>();
-    for (int i = 0; i < words.length; i++) {
-      if (!words[i].equals("") && !isNumber(words[i])) {
-        if (body)
-          rawWords.add(new RawDocumentWord(words[i], i+offset));
-        else
-          rawWords.add(new RawDocumentWord(words[i], -1));
-      }
-    }
-    //  System.out.println("HERE 5");
-    return rawWords;
-  }
-  */
+   //  shortcut for non-body lines
+   static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line) {
+   //  System.out.println("HERE 1");
+   //  System.out.println(line);
+   return RawDocumentWordsFromLine(line, 0, false);
+   }
+   //  shortcut for body lines
+   static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line, int offset) {
+   //  System.out.println("HERE 2");
+   //  System.out.println(line);
+   return RawDocumentWordsFromLine(line, offset, true);
+   }
+   
+   //  returns an array of RawDocumentWord from the input line
+   static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line, int offset, boolean body) {  //  if the line is from the body, save postings; otherwise, save as -1 (not that postings are actually ever really used)
+   //  check if empty word
+   if (line.equals(""))
+   return null;
+   //  System.out.println("HERE 3");
+   String[] words = wordsFromLine(line);
+   //  System.out.println("HERE 4");
+   ArrayList<RawDocumentWord> rawWords = new ArrayList<RawDocumentWord>();
+   for (int i = 0; i < words.length; i++) {
+   if (!words[i].equals("") && !isNumber(words[i])) {
+   if (body)
+   rawWords.add(new RawDocumentWord(words[i], i+offset));
+   else
+   rawWords.add(new RawDocumentWord(words[i], -1));
+   }
+   }
+   //  System.out.println("HERE 5");
+   return rawWords;
+   }
+   */
   
   //  takes a line of text and returns the words
   static String[] wordsFromLine(String line) {
@@ -537,19 +543,19 @@ class Dictionary {
     for (DictionaryWord docWord : doc.words) {
       //  too slow, use hashmap
       /*
-      //  check for matching word in dictionary
-      if (wordList.contains(docWord)) {
-        int position = wordList.indexOf(docWord);
-        words.get(position).addPosting(docWord.postings.get(0));
-      }
-      //  if match could not be found, add (shallow copy of) word to dictionary
-      else {
-        DictionaryWord dw = new DictionaryWord(docWord.word);
-        dw.addPosting(docWord.postings.get(0));  //  can do 0 as each document only has 1 posting (containing 1+ positions)
-        words.add(dw);
-        wordList.add(docWord.word);
-      }
-      */
+       //  check for matching word in dictionary
+       if (wordList.contains(docWord)) {
+       int position = wordList.indexOf(docWord);
+       words.get(position).addPosting(docWord.postings.get(0));
+       }
+       //  if match could not be found, add (shallow copy of) word to dictionary
+       else {
+       DictionaryWord dw = new DictionaryWord(docWord.word);
+       dw.addPosting(docWord.postings.get(0));  //  can do 0 as each document only has 1 posting (containing 1+ positions)
+       words.add(dw);
+       wordList.add(docWord.word);
+       }
+       */
       
       //  check for matching word in dictionary
       if (dictionaryMap.containsKey(docWord.word)) {
