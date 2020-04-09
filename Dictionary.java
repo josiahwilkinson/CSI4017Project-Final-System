@@ -226,12 +226,6 @@ class Dictionary {
         System.out.println("Finished creating raw documents");
         
         
-        //  print out dictionary
-        System.out.println("Finished constructing dictionary");
-        System.out.println();
-        //  dictionary.printDictionary();
-        
-        
         
         //  too slow, use hashmap
         //  ArrayList<String> wordList = new ArrayList<String>();
@@ -251,6 +245,12 @@ class Dictionary {
         
         
       }
+      
+      
+      //  print out dictionary
+      System.out.println("Finished constructing dictionary");
+      System.out.println();
+      //  dictionary.printDictionary();
       
       
       //  set weights for all postings
@@ -567,6 +567,7 @@ class Dictionary {
         DictionaryWord dw = new DictionaryWord(docWord.word);
         dictionaryMap.put(docWord.word, dw);
         dw.addPosting(docWord.postings.get(0));
+        docWord = dw;  //  change DictionaryWord object into reference so as to free up memory
         //  words.add(dw);
       }
     }

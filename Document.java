@@ -110,25 +110,35 @@ class RawDocumentWord {
 //  stores the bag of words/postings from each line of a document
 class ProperDocument {
   int id;
-  String title = "";
-  String date = "";
-  String topics = "";
-  String places = "";
-  String people = "";
-  String orgs = "";
-  String exchanges = "";
-  String companies = "";
+  String title;
+  String date;
+  String topics;
+  String places;
+  String people;
+  String orgs;
+  String exchanges;
+  String companies;
   
-  String dateline = "";
+  String dateline;
   
   ArrayList<DictionaryWord> words = new ArrayList<DictionaryWord>();
-  String description = "";
+  //  String description;
   
   ProperDocument(RawDocument doc) {
     //  set basic info
     id = doc.id;
     title = doc.title;
-    description = doc.description;
+    date = doc.date;
+    topics = doc.topics;
+    places = doc.places;
+    people = doc.people;
+    orgs = doc.orgs;
+    exchanges = doc.exchanges;
+    companies = doc.companies;
+    dateline = doc.dateline;
+    
+    //  description = doc.description;
+    
     //  System.out.println("Creating proper course: " + title);
     //  convert RawDocumentWord to Posting
     //  create single of each
@@ -177,9 +187,11 @@ class ProperDocument {
   
   //  prints the document as to be displayed
   void displayDocument() {
-    System.out.println(title + ":");
-    String[] lines = description.split("  ");
-    for (String line : lines)
-    System.out.println(line);
+    /*
+     System.out.println(title + ":");
+     String[] lines = description.split("  ");
+     for (String line : lines)
+     System.out.println(line);
+     */
   }
 }
