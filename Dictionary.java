@@ -95,7 +95,7 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<DATE>")) {
                   currentDocument.addDate(originalLine.substring(6, originalLine.length()-7));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(6, originalLine.length()-7)));
+                  currentDocument.addWords(wordsFromLine(line.substring(6, originalLine.length()-7)));
                 }
               }
               
@@ -103,7 +103,7 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<TOPIC")) {
                   currentDocument.addDate(originalLine.substring(8, originalLine.length()-9));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(8, originalLine.length()-9)));
+                  currentDocument.addWords(wordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
               }
               
@@ -111,7 +111,7 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<PLACE")) {
                   currentDocument.addDate(originalLine.substring(8, originalLine.length()-9));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(8, originalLine.length()-9)));
+                  currentDocument.addWords(wordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
               }
               
@@ -119,7 +119,7 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<PEOPL")) {
                   currentDocument.addDate(originalLine.substring(8, originalLine.length()-9));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(8, originalLine.length()-9)));
+                  currentDocument.addWords(wordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
               }
               
@@ -127,7 +127,7 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 5).equals("<ORGS>")) {
                   currentDocument.addDate(originalLine.substring(6, originalLine.length()-7));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(6, originalLine.length()-7)));
+                  currentDocument.addWords(wordsFromLine(line.substring(6, originalLine.length()-7)));
                 }
               }
               
@@ -135,7 +135,7 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<EXCHA")) {
                   currentDocument.addDate(originalLine.substring(11, originalLine.length()-12));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(11, originalLine.length()-12)));
+                  currentDocument.addWords(wordsFromLine(line.substring(11, originalLine.length()-12)));
                 }
               }
               
@@ -143,7 +143,7 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<COMPA")) {
                   currentDocument.addDate(originalLine.substring(11, originalLine.length()-12));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(11, originalLine.length()-12)));
+                  currentDocument.addWords(wordsFromLine(line.substring(11, originalLine.length()-12)));
                 }
               }
               
@@ -181,7 +181,7 @@ class Dictionary {
                     }
                   }
                   currentDocument.addDateLine(dateLine);
-                  currentDocument.addWords(RawDocumentWordsFromLine(dateLine));
+                  currentDocument.addWords(wordsFromLine(dateLine));
                   
                   //  get text body
                   //  first line
@@ -193,13 +193,11 @@ class Dictionary {
                   line = line.toLowerCase();
                   lineCounter++;
                   
-                  //  offset counter for word postings
-                  int offset = 0;
+                  //  add words
                   while(!originalLine.equals("</REUTERS>")) {
                     if (!line.equals("")) {
                       currentDocument.addLine(originalLine);
-                      ArrayList<RawDocumentWord> words = RawDocumentWordsFromLine(line, offset);
-                      offset += words.size();
+                      String[] words = wordsFromLine(line);
                       currentDocument.addWords(words);
                     }
                     line = br.readLine();
@@ -433,7 +431,7 @@ class Dictionary {
   }
   
   
-  
+  /*
   //  shortcut for non-body lines
   static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line) {
     //  System.out.println("HERE 1");
@@ -467,7 +465,7 @@ class Dictionary {
     //  System.out.println("HERE 5");
     return rawWords;
   }
-  
+  */
   
   //  takes a line of text and returns the words
   static String[] wordsFromLine(String line) {

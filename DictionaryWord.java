@@ -90,6 +90,10 @@ class Posting {
     docID = id;
     postings = p.length;
   }
+  Posting(int id, int p) {
+    docID = id;
+    postings = p;
+  }
   
   void addPosting() {
     postings++;
