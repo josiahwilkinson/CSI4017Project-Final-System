@@ -185,26 +185,8 @@
              //used from https://www.tutorialspoint.com/how-can-we-implement-a-long-text-of-the-joptionpane-message-dialog-in-java
              JTextArea jta = new JTextArea(20, 50);
              
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             
-             //  jta.setText(Vanilla.documents[index[result.getSelectedRow()]].title+"\n\n"+
-             //              printdescription(Vanilla.documents[index[result.getSelectedRow()]].description.split("  ")));
-             
-             
-             
-             
-             
-             
-             
+             jta.setText(Vanilla.documents[index[result.getSelectedRow()]].title+"\n\n"+
+                         printdescription(Vanilla.documents[index[result.getSelectedRow()]].description.split("  ")));
              
              jta.setEditable(false);
              jta.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);

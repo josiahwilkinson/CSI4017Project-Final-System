@@ -122,7 +122,7 @@ class ProperDocument {
   String dateline;
   
   ArrayList<DictionaryWord> words = new ArrayList<DictionaryWord>();
-  //  String description;
+  String description;
   
   ProperDocument(RawDocument doc) {
     //  set basic info
@@ -137,7 +137,7 @@ class ProperDocument {
     companies = doc.companies;
     dateline = doc.dateline;
     
-    //  description = doc.description;
+    description = doc.description;
     
     //  System.out.println("Creating proper course: " + title);
     //  convert RawDocumentWord to Posting
@@ -187,11 +187,9 @@ class ProperDocument {
   
   //  prints the document as to be displayed
   void displayDocument() {
-    /*
-     System.out.println(title + ":");
-     String[] lines = description.split("  ");
-     for (String line : lines)
-     System.out.println(line);
-     */
+    System.out.println(title + ":");
+    String[] lines = description.split("  ");
+    for (String line : lines)
+      System.out.println(line);
   }
 }

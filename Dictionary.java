@@ -540,7 +540,8 @@ class Dictionary {
   //  integrates the Proper document into the dictionary
   static void addDocument(ProperDocument doc,  HashMap<String, DictionaryWord> dictionaryMap) {
     //  scan all dictionary words in doc
-    for (DictionaryWord docWord : doc.words) {
+    //  for (DictionaryWord docWord : doc.words) {
+    for (int i = 0; i < doc.words.size(); i++) {
       //  too slow, use hashmap
       /*
        //  check for matching word in dictionary
@@ -558,16 +559,18 @@ class Dictionary {
        */
       
       //  check for matching word in dictionary
-      if (dictionaryMap.containsKey(docWord.word)) {
-        dictionaryMap.get(docWord.word).addPosting(docWord.postings.get(0));
-        docWord = dictionaryMap.get(docWord.word);  //  change DictionaryWord object into reference so as to free up memory
+      if (dictionaryMap.containsKey(doc.words.get(i).word)) {
+        dictionaryMap.get(doc.words.get(i).word).addPosting(doc.words.get(i).postings.get(0));
+        doc.words.add(i, dictionaryMap.get(doc.words.get(i).word));  //  add DictionaryWord object as reference so as to free up memory
+        doc.words.remove((i+1));  //  remove old DictionaryWord object so as to free up memory
       }
       //  otherwise, add it
       else {
-        DictionaryWord dw = new DictionaryWord(docWord.word);
-        dictionaryMap.put(docWord.word, dw);
-        dw.addPosting(docWord.postings.get(0));
-        docWord = dw;  //  change DictionaryWord object into reference so as to free up memory
+        DictionaryWord dw = new DictionaryWord(doc.words.get(i).word);
+        dictionaryMap.put(doc.words.get(i).word, dw);
+        dw.addPosting(doc.words.get(i).postings.get(0));
+        doc.words.add(i, dw);  //  change DictionaryWord object into reference so as to free up memory
+        doc.words.remove((i+1));  //  remove old DictionaryWord object so as to free up memory
         //  words.add(dw);
       }
     }
