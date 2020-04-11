@@ -6,6 +6,8 @@
    
      import java.awt.*;
      import java.util.ArrayList;
+     import java.awt.event.ActionListener;
+     import java.awt.event.ActionEvent;
    
      public class UI extends JFrame {
     
@@ -19,7 +21,8 @@
        private VanillaSystem Vanilla = new VanillaSystem();
        private SpellCorrector correct= new SpellCorrector(Vanilla.dictionary);
        String[] choices = { "UOttawa","Reuters"};
-       final JComboBox<String> cb = new JComboBox<String>(choices);
+       boolean reuters;
+       final JComboBox<String> collection = new JComboBox<String>(choices);
        int index[];
        String listnew[];
        int pick;
@@ -63,7 +66,7 @@
            
             search.setText(info); 
             
-            index=VanillaSystem.booleanSearchWithQuery(info);
+            index=VanillaSystem.booleanSearchWithQuery(info,reuters);
            
       for(int i:index) {
                
@@ -94,7 +97,7 @@
               
      }
             search.setText(info); 
-            index=VanillaSystem.vectorSearchWithQuery(info);
+            index=VanillaSystem.vectorSearchWithQuery(info,reuters);
            
        for(int i:index) {
             model.addRow(new Object [] {VanillaSystem.documents[i].title});
@@ -231,23 +234,37 @@
          panel.add(VSMButton,BorderLayout.CENTER);
          panel.add(BooleanButton,BorderLayout.WEST);
          panel.add(scrollPane);
-         panel.add(cb);
+         panel.add(collection);
 
          add(panel);
          
          
        }
        
-       private void Table() {
+       public void Table() {
          VSMButton.addActionListener(e -> result.setModel(makeModel(search.getText(),0)));
          BooleanButton.addActionListener(f -> result.setModel(makeModel(search.getText(),1)));
          
-         
-         
-       }
+          ActionListener cbActionListener = new ActionListener() {
+           
+            public void actionPerformed(ActionEvent e) {
+
+                String s = (String) collection.getSelectedItem();//get the selected item
+                if(s.equals("Reuters")){
+                  reuters=true;
+                }else{
+                  reuters=false;
+                }
      }
+   };
+   collection.addActionListener(cbActionListener);
+ }
+}
+
+     
        
        
+
        
        
      
