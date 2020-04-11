@@ -95,6 +95,17 @@ class Dictionary {
           
           //  check for new beginning
           if (originalLine.length() > 0) {
+            
+            //  trim * at beginning
+            while(originalLine.length() > 0) {
+              if (originalLine.charAt(0) == '*') {
+                originalLine = originalLine.substring(1, originalLine.length()); 
+                line = line.toLowerCase();
+              }
+              else
+                break;
+            }
+            
             if (originalLine.length() > 8) {
               if (originalLine.substring(0, 8).equals("<REUTERS")) {
                 //  get id
