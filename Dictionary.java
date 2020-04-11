@@ -121,10 +121,20 @@ class Dictionary {
                 }
               }
               
+              //  title
+              if (originalLine.length() > 6) {
+                if (originalLine.substring(0, 6).equals("<TITLE")) {
+                  currentDocument.addTitle(originalLine.substring(7, originalLine.length()-8));
+                  currentDocument.addWords(wordsFromLine(line.substring(7, originalLine.length()-8)));
+                  if (currentDocument.id == 440 || currentDocument.id == 455 || currentDocument.id == 459)
+                    System.out.println("found title:" + " " + line.substring(7, originalLine.length()-8));
+                }
+              }
+              
               //  topics
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<TOPIC")) {
-                  currentDocument.addDate(originalLine.substring(8, originalLine.length()-9));
+                  currentDocument.addTopics(originalLine.substring(8, originalLine.length()-9));
                   currentDocument.addWords(wordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
               }
@@ -132,7 +142,7 @@ class Dictionary {
               //  places
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<PLACE")) {
-                  currentDocument.addDate(originalLine.substring(8, originalLine.length()-9));
+                  currentDocument.addPlaces(originalLine.substring(8, originalLine.length()-9));
                   currentDocument.addWords(wordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
               }
@@ -140,7 +150,7 @@ class Dictionary {
               //  people
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<PEOPL")) {
-                  currentDocument.addDate(originalLine.substring(8, originalLine.length()-9));
+                  currentDocument.addPeople(originalLine.substring(8, originalLine.length()-9));
                   currentDocument.addWords(wordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
               }
@@ -148,7 +158,7 @@ class Dictionary {
               //  orgs
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 5).equals("<ORGS>")) {
-                  currentDocument.addDate(originalLine.substring(6, originalLine.length()-7));
+                  currentDocument.addOrgs(originalLine.substring(6, originalLine.length()-7));
                   currentDocument.addWords(wordsFromLine(line.substring(6, originalLine.length()-7)));
                 }
               }
@@ -156,7 +166,7 @@ class Dictionary {
               //  exchanges
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<EXCHA")) {
-                  currentDocument.addDate(originalLine.substring(11, originalLine.length()-12));
+                  currentDocument.addExchanges(originalLine.substring(11, originalLine.length()-12));
                   currentDocument.addWords(wordsFromLine(line.substring(11, originalLine.length()-12)));
                 }
               }
@@ -164,7 +174,7 @@ class Dictionary {
               //  companies
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<COMPA")) {
-                  currentDocument.addDate(originalLine.substring(11, originalLine.length()-12));
+                  currentDocument.addCompanies(originalLine.substring(11, originalLine.length()-12));
                   currentDocument.addWords(wordsFromLine(line.substring(11, originalLine.length()-12)));
                 }
               }
@@ -241,6 +251,16 @@ class Dictionary {
         
         
         
+      System.out.println("checking for titles");
+      for (int j = 0; j < rawDocuments.size(); j++) {
+      //  System.out.println(j+": "+rawDocuments.get(j).title);
+      }
+      System.out.println(493+": "+rawDocuments.get(493).title);
+      System.out.println(454+": "+rawDocuments.get(454).title);
+      System.out.println(458+": "+rawDocuments.get(458).title);
+        
+        
+        
         System.out.println("Finished creating raw documents");
         
         
@@ -265,6 +285,24 @@ class Dictionary {
       }
       
       
+      
+      
+      
+      
+      
+      
+      System.out.println("checking for titles");
+      for (int j = 0; j < reutersDocumentList.size(); j++) {
+        System.out.println(j+": "+reutersDocumentList.get(j).title);
+      }
+      
+      
+      
+      
+      
+      
+      
+      
       //  print out dictionary
       System.out.println("Finished constructing dictionary");
       System.out.println();
@@ -281,7 +319,7 @@ class Dictionary {
       for (int k = 0; k < mapKeyCopy.size(); k++) {
         DictionaryWord word = reutersDictionaryMap.get(mapKeyCopy.get(k));
         //  status update
-        float total = 20;
+        float total = 10;
         for (float p = 1; p < total+1; p++) {
           if ((int)((float)(p*mapKeyCopy.size())/total) == k+1)
             System.out.println((int)(p*total)+"%");
@@ -306,7 +344,6 @@ class Dictionary {
       }
       System.out.println("finished removing stopwords");
       System.out.println();
-      
       
       
       
