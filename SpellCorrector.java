@@ -1,102 +1,101 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.io.*;
+import java.io.FileNotFoundException; 
+import java.lang.Math; 
+import java.util.HashMap;
+
 
 public class SpellCorrector {
   private Dictionary dict;
-  boolean reuter;
-  ArrayList<String> suggestions = new ArrayList<String>();
+  //  boolean reuter;
   
   
   
   
   
   
-  public SpellCorrector(Dictionary d,boolean reuters) {
+  public SpellCorrector(Dictionary d) {
     this.dict=d;
-    this.reuter=reuters;
+    //  this.reuter=reuters;
   }
   
   
   
-  public ArrayList<String> getSuggestions(String word){
+  public ArrayList<String> getSuggestions(String word, boolean reuters){
     //set min editdistance to compare 
+    System.out.println();
+    System.out.println("getting suggestions for: \"" + word + "\"");
     
-    if(reuter){
-      int initial=editDistDP(word,dict.reutersDictionaryMap.get(0).word,word.length(),dict.reutersDictionaryMap.get(0).word.length());
-       for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.reutersDictionaryMap.values())) {
-      if(editDistDP(word,w.word,word.length(),w.word.length())<initial) {
-        suggestions=new ArrayList<String>();
-        suggestions.add(w.word);
-        initial=editDistDP(word,w.word,word.length(),w.word.length());
+    ArrayList<String> suggestions=new ArrayList<String>();
+    
+    ArrayList<String> dictionary;
+    if (reuters)
+      dictionary = new ArrayList<String>(dict.reutersDictionaryMap.keySet());
+    else
+      dictionary = new ArrayList<String>(dict.uottawaDictionaryMap.keySet());
+    
+    
+    
+    int initial = editDistDP(word, dictionary.get(0), word.length(), dictionary.get(0).length());;
+    for (int i = 0; i < dictionary.size(); i++) {
+      String w = dictionary.get(i);
         
-        
-        
-        
-      }else if(editDistDP(word,w.word,word.length(),w.word.length())==initial) {
-        suggestions.add(w.word);
-        
-        
-        
+      if (editDistDP(word, w,word.length(), w.length()) < initial) {
+        suggestions.add(w);
+        initial = editDistDP(word, w,word.length(), w.length());
       }
-      
-      
-      
+      else if(editDistDP(word, w, word.length(), w.length()) == initial) {
+        suggestions.add(w);
+      }
     }
-    }else{
-      int initial=editDistDP(word,dict.uottawaDictionaryMap.get(0).word,word.length(),dict.uottawaDictionaryMap.get(0).word.length());
     
-    //runs through dictionary to get suggestions
-    for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.uottawaDictionaryMap.values())){
-      if(editDistDP(word,w.word,word.length(),w.word.length())<initial) {
-        suggestions=new ArrayList<String>();
-        suggestions.add(w.word);
-        initial=editDistDP(word,w.word,word.length(),w.word.length());
-        
-        
-        
-        
-      }else if(editDistDP(word,w.word,word.length(),w.word.length())==initial) {
-        suggestions.add(w.word);
-        
-        
-        
-      }
-      
-      
-      
-    }}
-    System.out.println(suggestions.toString());
-    return suggestions; 
-    
-    
+    System.out.println("suggestions: " + suggestions.toString());
+    return suggestions;
   }
   
   
   
   
   
-  public boolean inDictionary(String word){
-    if(this.reuter){
-    for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.reutersDictionaryMap.values())) {
-      if(w.word.equals(word)){
+  public boolean inDictionary(String word, boolean reuters){
+    
+    if (reuters) {
+      if (dict.reutersDictionaryMap.containsKey(word))
         return true;
-        
-      }
-      
     }
+    
+    else { if (dict.uottawaDictionaryMap.containsKey(word))
+      return true;
+    }
+    
     return false;
     
-  }else{
-    for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.uottawaDictionaryMap.values())) {
-          if(w.word.equals(word)){
-            return true;
-            
-          }
-      
-    }
-    return false;
-
-
-  }}
+    
+    /*
+     if(this.reuter){
+     for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.reutersDictionaryMap.values())) {
+     if(w.word.equals(word)){
+     return true;
+     
+     }
+     
+     }
+     return false;
+     
+     }else{
+     for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.uottawaDictionaryMap.values())) {
+     if(w.word.equals(word)){
+     return true;
+     
+     }
+     
+     }
+     return false;
+     
+     }
+     */
+  }
   static int min(int x, int y, int z) 
   { 
     return Math.min(Math.min(x, y), z);

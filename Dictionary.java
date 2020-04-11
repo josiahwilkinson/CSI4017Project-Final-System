@@ -303,8 +303,10 @@ class Dictionary {
       
       
       System.out.println("checking for titles");
+      System.out.print("no titles: ");
       for (int j = 0; j < reutersDocumentList.size(); j++) {
-        System.out.println(j+": "+reutersDocumentList.get(j).title);
+        if (reutersDocumentList.get(j).title.equals("") || reutersDocumentList.get(j).title.equals(" ") || reutersDocumentList.get(j).title.equals("  "))
+          System.out.print(reutersDocumentList.get(j).id + ", ");
       }
       
       

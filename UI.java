@@ -37,12 +37,11 @@
        
        
        
-       private DefaultTableModel makeModel(String info,int type) {
-         SpellCorrector correct= new SpellCorrector(Vanilla.dictionary,reuters);
+       private DefaultTableModel makeModel(String info,int type, boolean reuters) {
+         SpellCorrector correct= new SpellCorrector(Vanilla.dictionary);
          DefaultTableModel model = new DefaultTableModel();
          model.addColumn("Titles");
-         try{
-          correct.reuter=reuters;
+         try {
          if(type==1){
            
            ArrayList<ArrayList<String>>list=Vanilla.booleanQueryProcessing.processQuery(info);
@@ -54,9 +53,9 @@
                word=word.substring(1,word.length());
              }
               old=word;
-             if(!correct.inDictionary(word)){
+             if(!correct.inDictionary(word, reuters)){
                //if not in dictionary popup with suggestions to replace. once clicked, replace word with suggestion. 
-             word=makeDialog(word,correct.getSuggestions(word));              
+             word=makeDialog(word,correct.getSuggestions(word, reuters));              
              
              info=info.replace(old,word);
                  
@@ -91,9 +90,9 @@
                word=word.substring(1,word.length());
              }
               old=word;
-             if(!correct.inDictionary(word)){
+             if(!correct.inDictionary(word, reuters)){
                //if not in dictionary popup with suggestions to replace. once clicked, replace word with suggestion. 
-             word=makeDialog(word,correct.getSuggestions(word));              
+             word=makeDialog(word,correct.getSuggestions(word, reuters));              
              
              info=info.replace(old,word);
                  
@@ -264,8 +263,8 @@
        }
        
        public void Table() {
-         VSMButton.addActionListener(e -> result.setModel(makeModel(search.getText(),0)));
-         BooleanButton.addActionListener(f -> result.setModel(makeModel(search.getText(),1)));
+         VSMButton.addActionListener(e -> result.setModel(makeModel(search.getText(),0, reuters)));
+         BooleanButton.addActionListener(f -> result.setModel(makeModel(search.getText(),1, reuters)));
          
           ActionListener cbActionListener = new ActionListener() {
            
