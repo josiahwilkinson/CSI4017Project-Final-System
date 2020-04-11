@@ -19,12 +19,10 @@ public class SpellCorrector {
   
   public ArrayList<String> getSuggestions(String word){
     //set min editdistance to compare 
-    /*
     
-    int initial=editDistDP(word,dict.words.get(0).word,word.length(),dict.words.get(0).word.length());
-    
-    //runs through dictionary to get suggestions
-    for(DictionaryWord w: dict.words) {
+    if(reuter){
+      int initial=editDistDP(word,dict.reutersDictionaryMap.get(0).word,word.length(),dict.reutersDictionaryMap.get(0).word.length());
+       for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.reutersDictionaryMap.values())) {
       if(editDistDP(word,w.word,word.length(),w.word.length())<initial) {
         suggestions=new ArrayList<String>();
         suggestions.add(w.word);
@@ -43,10 +41,33 @@ public class SpellCorrector {
       
       
     }
+    }else{
+      int initial=editDistDP(word,dict.uottawaDictionaryMap.get(0).word,word.length(),dict.uottawaDictionaryMap.get(0).word.length());
+    
+    //runs through dictionary to get suggestions
+    for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.uottawaDictionaryMap.values())){
+      if(editDistDP(word,w.word,word.length(),w.word.length())<initial) {
+        suggestions=new ArrayList<String>();
+        suggestions.add(w.word);
+        initial=editDistDP(word,w.word,word.length(),w.word.length());
+        
+        
+        
+        
+      }else if(editDistDP(word,w.word,word.length(),w.word.length())==initial) {
+        suggestions.add(w.word);
+        
+        
+        
+      }
+      
+      
+      
+    }}
     System.out.println(suggestions.toString());
     return suggestions; 
-    */
-    return null;
+    
+    
   }
   
   
@@ -54,6 +75,7 @@ public class SpellCorrector {
   
   
   public boolean inDictionary(String word){
+    if(this.reuter){
     for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.reutersDictionaryMap.values())) {
       if(w.word.equals(word)){
         return true;
@@ -63,7 +85,18 @@ public class SpellCorrector {
     }
     return false;
     
-  }
+  }else{
+    for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.uottawaDictionaryMap.values())) {
+          if(w.word.equals(word)){
+            return true;
+            
+          }
+      
+    }
+    return false;
+
+
+  }}
   static int min(int x, int y, int z) 
   { 
     return Math.min(Math.min(x, y), z);

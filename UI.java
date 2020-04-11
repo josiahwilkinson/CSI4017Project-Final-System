@@ -20,7 +20,7 @@
        private JScrollPane scrollPane = new JScrollPane(result);
        private VanillaSystem Vanilla = new VanillaSystem();
        boolean reuters=false;
-       private SpellCorrector correct= new SpellCorrector(Vanilla.dictionary,reuters);
+       
        String[] choices = { "UOttawa","Reuters"};
        
        final JComboBox<String> collection = new JComboBox<String>(choices);
@@ -38,10 +38,11 @@
        
        
        private DefaultTableModel makeModel(String info,int type) {
-        
+         SpellCorrector correct= new SpellCorrector(Vanilla.dictionary,reuters);
          DefaultTableModel model = new DefaultTableModel();
-         model.addColumn("Course Codes");
+         model.addColumn("Titles");
          try{
+          correct.reuter=reuters;
          if(type==1){
            
            ArrayList<ArrayList<String>>list=Vanilla.booleanQueryProcessing.processQuery(info);
@@ -82,7 +83,7 @@
            
          }else if(type==0){
            String[] list=Vanilla.vectorQueryProcessing.processQuery(info);
-          
+         
            for(String word:list){
             
             String old;
