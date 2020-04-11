@@ -12,11 +12,14 @@
        private JTextField search = new JTextField(30);
        private JButton VSMButton = new JButton("VSM Search");
        private JButton BooleanButton = new JButton("Boolean Search");
+
        private JTable result = new JTable();
        private JPanel panel = new JPanel();
        private JScrollPane scrollPane = new JScrollPane(result);
        private VanillaSystem Vanilla = new VanillaSystem();
        private SpellCorrector correct= new SpellCorrector(Vanilla.dictionary);
+       String[] choices = { "UOttawa","Reuters"};
+       final JComboBox<String> cb = new JComboBox<String>(choices);
        int index[];
        String listnew[];
        int pick;
@@ -171,7 +174,7 @@
          super(title);
          Vanilla.createDictionary();
          
-         setSize(650, 600);
+         setSize(650, 625);
          setResizable(false);
          scrollPane.setPreferredSize(new Dimension (600,500)); 
          addComponents();
@@ -228,6 +231,8 @@
          panel.add(VSMButton,BorderLayout.CENTER);
          panel.add(BooleanButton,BorderLayout.WEST);
          panel.add(scrollPane);
+         panel.add(cb);
+
          add(panel);
          
          
