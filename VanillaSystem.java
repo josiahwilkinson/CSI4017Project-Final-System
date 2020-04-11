@@ -38,7 +38,7 @@ class VanillaSystem {
    -ly -> -
    -ed -> -e
    */
-  static String[] stemmingRules = {"s", "", "es", "", "ies", "y", "ing", "", "ing", "e", "tion", "te", "tion", "e", "ation", "e", "ers", "e", "ers", "", "er", "e", "er", "", "ly", "", "ed", "e"};
+  static String[] stemmingRules = {"'s", "", "s", "", "es", "", "ies", "y", "ing", "", "ing", "e", "tion", "te", "tion", "e", "ation", "e", "ers", "e", "ers", "", "er", "e", "er", "", "ly", "", "ed", "e"};
   
   
   //  different trackers
@@ -47,7 +47,7 @@ class VanillaSystem {
   
   
   
-  static Dictionary dictionary = new Dictionary(punctuation, stemmingRules);
+  static Dictionary dictionary = new Dictionary(punctuation, stemmingRules);  //  does NOT create the dictionary, merely passes through the punctuation and stemming rules
   
   
   

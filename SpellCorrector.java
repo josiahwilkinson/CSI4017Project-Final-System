@@ -53,25 +53,16 @@ public class SpellCorrector {
   
   
   public boolean inDictionary(String word){
-    for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.dictionaryMap.values())) {
+    for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.reutersDictionaryMap.values())) {
       if(w.word.equals(word)){
-         return true;
-    
-  }
-     
+        return true;
+        
+      }
+      
     }
     return false;
-  
+    
   }
-  static int min(int x, int y, int z) 
-  { 
-    if (x <= y && x <= z) 
-      return x; 
-    if (y <= x && y <= z) 
-      return y; 
-    else
-      return z; 
-  } 
   
   
   
@@ -110,7 +101,6 @@ public class SpellCorrector {
     
     return dp[m][n]; 
   } 
-  
   
   
   

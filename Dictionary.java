@@ -17,9 +17,23 @@ class Dictionary {
   static char[] punctuation;
   
   
+  static String[] stopWords = {"a", "about", "above", "after", "again", "against", "ain", "all", "am", "an", "and", "any", "are", "aren", "aren't", "as", "at", "be", "because", "been",
+    "before", "being", "below", "between", "both", "but", "by", "can", "couldn", "couldn't", "d", "did", "didn", "didn't", "do", "does", "doesn", "doesn't",
+    "doing", "don", "don't", "down", "during", "each", "few", "for", "from", "further", "had", "hadn", "hadn't", "has", "hasn", "hasn't", "have", "haven",
+    "haven't", "having", "he", "her", "here", "hers", "herself", "him", "himself", "his", "how", "i", "if", "in", "into", "is", "isn", "isn't", "it", "it's",
+    "its", "itself", "just", "ll", "m", "ma", "me", "mightn", "mightn't", "more", "most", "mustn", "mustn't", "my", "myself", "needn", "needn't", "no", "nor",
+    "not", "now", "o", "of", "off", "on", "once", "only", "or", "other", "our", "ours", "ourselves", "out", "over", "own", "re", "s", "same", "shan", "shan't",
+    "she", "she's", "should", "should've", "shouldn", "shouldn't", "so", "some", "such", "t", "than", "that", "that'll", "the", "their", "theirs", "them",
+    "themselves", "then", "there", "these", "they", "this", "those", "through", "to", "too", "under", "until", "up", "ve", "very", "was", "wasn", "wasn't",
+    "we", "were", "weren", "weren't", "what", "when", "where", "which", "while", "who", "whom", "why", "will", "with", "won", "won't", "wouldn", "wouldn't",
+    "y", "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves", "could", "he'd", "he'll", "he's", "here's", "how's", "i'd",
+    "i'll", "i'm", "i've", "let's", "ought", "she'd", "she'll", "that's", "there's", "they'd", "they'll", "they're", "they've", "we'd", "we'll", "we're", "we've",
+    "what's", "when's", "where's", "who's", "why's", "would"};
+  
+  
   //  static ArrayList<DictionaryWord> words = new ArrayList<DictionaryWord>();
   
-  static HashMap<String, DictionaryWord> dictionaryMap = new HashMap<String, DictionaryWord>();
+  static HashMap<String, DictionaryWord> reutersDictionaryMap = new HashMap<String, DictionaryWord>();
   
   
   public static void main(String args[]) {
@@ -233,13 +247,13 @@ class Dictionary {
         //  documents = new ProperDocument[rawDocuments.size()];
         
         for (int j = 0; j < rawDocuments.size(); j++) {
-          if (j%25 == 0)
-            System.out.println(j + " " + documentList.size() + " " + dictionaryMap.size());
+          if (j%100 == 0)
+            System.out.println(j + " " + documentList.size() + " " + reutersDictionaryMap.size());
           //  documents[j] = new ProperDocument(rawDocuments.get(j));
           ProperDocument pd = new ProperDocument(rawDocuments.get(j));
           documentList.add(pd);
           //  create dictionary compiling all proper documents
-          addDocument(pd, dictionaryMap);
+          addDocument(pd, reutersDictionaryMap);
         }
         System.out.println("Finished creating proper documents");
         
@@ -250,23 +264,43 @@ class Dictionary {
       //  print out dictionary
       System.out.println("Finished constructing dictionary");
       System.out.println();
-      //  dictionary.printDictionary();
+      //  printDictionary();
       
       
       //  set weights for all postings
       System.out.println("adding weights to dictionary");
       System.out.println();
-      /*
-       for (DictionaryWord word : words) {
-       for (int i = 0; i < documents.length; i++) {
-       if (word.posting(i) != null) {  //  check that there is the posting for the document with this as the id
-       setWeight(word, i);
-       }
-       }
-       }
-       */
+      
+      //  for (DictionaryWord word : new ArrayList<DictionaryWord>(reutersDictionaryMap.values())) {
+      //  ArrayList<DictionaryWord> mapCopy = new ArrayList<DictionaryWord>(reutersDictionaryMap.values());
+      ArrayList<String> mapKeyCopy = new ArrayList<String>(reutersDictionaryMap.keySet());
+      for (int k = 0; k < mapKeyCopy.size(); k++) {
+        DictionaryWord word = reutersDictionaryMap.get(mapKeyCopy.get(k));
+        //  status update
+        float total = 20;
+        for (float p = 1; p < total+1; p++) {
+          if ((int)((float)(p*mapKeyCopy.size())/total) == k+1)
+            System.out.println((int)(p*total)+"%");
+        }
+        for (int j = 0; j < documentList.size(); j++) {
+          if (word.posting(j) != null) {  //  check that there is the posting for the document with this as the id
+            setWeight(word, j);
+          }
+        }
+      }
+      
       System.out.println("finished adding weights to dictionary");
-      System.out.println("didn't actually add weights to dictionary");
+      System.out.println();
+      
+      
+      //  remove stopwords
+      System.out.println("removing stopwords from dictionary");
+      System.out.println();
+      for (String word : stopWords) {
+        if (reutersDictionaryMap.containsKey(word))
+          reutersDictionaryMap.remove(word);
+      }
+      System.out.println("finished removing stopwords");
       System.out.println();
       
       
@@ -538,7 +572,7 @@ class Dictionary {
   
   
   //  integrates the Proper document into the dictionary
-  static void addDocument(ProperDocument doc,  HashMap<String, DictionaryWord> dictionaryMap) {
+  static void addDocument(ProperDocument doc,  HashMap<String, DictionaryWord> reutersDictionaryMap) {
     //  scan all dictionary words in doc
     //  for (DictionaryWord docWord : doc.words) {
     for (int i = 0; i < doc.words.size(); i++) {
@@ -559,15 +593,15 @@ class Dictionary {
        */
       
       //  check for matching word in dictionary
-      if (dictionaryMap.containsKey(doc.words.get(i).word)) {
-        dictionaryMap.get(doc.words.get(i).word).addPosting(doc.words.get(i).postings.get(0));
-        doc.words.add(i, dictionaryMap.get(doc.words.get(i).word));  //  add DictionaryWord object as reference so as to free up memory
+      if (reutersDictionaryMap.containsKey(doc.words.get(i).word)) {
+        reutersDictionaryMap.get(doc.words.get(i).word).addPosting(doc.words.get(i).postings.get(0));
+        doc.words.add(i, reutersDictionaryMap.get(doc.words.get(i).word));  //  add DictionaryWord object as reference so as to free up memory
         doc.words.remove((i+1));  //  remove old DictionaryWord object so as to free up memory
       }
       //  otherwise, add it
       else {
         DictionaryWord dw = new DictionaryWord(doc.words.get(i).word);
-        dictionaryMap.put(doc.words.get(i).word, dw);
+        reutersDictionaryMap.put(doc.words.get(i).word, dw);
         dw.addPosting(doc.words.get(i).postings.get(0));
         doc.words.add(i, dw);  //  change DictionaryWord object into reference so as to free up memory
         doc.words.remove((i+1));  //  remove old DictionaryWord object so as to free up memory
@@ -578,20 +612,20 @@ class Dictionary {
   
   //  returns true if the dictionary contains the input word
   boolean hasWord(String w) {
-    return dictionaryMap.containsKey(w);
+    return reutersDictionaryMap.containsKey(w);
   }
   
   //  returns the DictionaryWord matching the input word
   DictionaryWord getWord(String w) {
     if (hasWord(w))
-      return dictionaryMap.get(w);
+      return reutersDictionaryMap.get(w);
     return null;
   }
   
   //  prints the dictionary to the console
-  void printDictionary() {
+  static void printDictionary() {
     System.out.println("Dictionary:");
-    for (DictionaryWord word : new ArrayList<DictionaryWord>(dictionaryMap.values())) {
+    for (DictionaryWord word : new ArrayList<DictionaryWord>(reutersDictionaryMap.values())) {
       System.out.println();
       System.out.print(word.word + " || ");
       for (Posting posting : word.postings) {
@@ -614,7 +648,7 @@ class Dictionary {
   
   
   static float inverseDocumentFrequency(DictionaryWord word) {
-    return (float)(Math.log(dictionaryMap.size()/word.totalDocuments()));
+    return (float)(Math.log(reutersDictionaryMap.size()/word.totalDocuments()));
   }
   
   static float termFrequency(DictionaryWord word, int docID) {
