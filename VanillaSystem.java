@@ -3,6 +3,7 @@ import java.util.Collections;
 import java.io.*;
 import java.io.FileNotFoundException; 
 import java.lang.Math; 
+import java.util.HashMap;
 
 
 class VanillaSystem {
@@ -12,7 +13,7 @@ class VanillaSystem {
   
   
   //  all documents
-  static ProperDocument[] documents;  //  to be initialized after the construction and processing of raw documents
+  //  static ProperDocument[] documents;  //  to be initialized after the construction and processing of raw documents
   
   
   
@@ -67,9 +68,11 @@ class VanillaSystem {
     
     
     //  dictionary
+    /*
     System.out.println("creating dictionary");
     documents = dictionary.createDictionary(documents);
     System.out.println("dictionary created");
+    */
     
     
     /*
@@ -98,19 +101,26 @@ class VanillaSystem {
   
   
   void createDictionary() {
-    dictionary = new Dictionary(punctuation, stemmingRules);
-    documents = dictionary.createDictionary(documents);
+    //  dictionary = new Dictionary(punctuation, stemmingRules);
+    dictionary.createDictionary();
   }
   
   
   
   //  an entered query is turned into queries and then queried on the dictionary to turn back relevent pages (array of the document IDs)
-  static int[] booleanSearchWithQuery(String query) {
+  static int[] booleanSearchWithQuery(String query, boolean reuters) {  //  if reuters is true, use the reuters dictionary and documents; otherwise, use the uottawa classes) {
     //  get queries
     ArrayList<ArrayList<String>> queries = booleanQueryProcessing.processQuery(query);
     
     //  resulting docs
     ArrayList<Integer> docs = new ArrayList<Integer>();
+    
+    //  get hashmap
+    HashMap<String, DictionaryWord> dictionaryMap;
+    if (reuters)
+      dictionaryMap = dictionary.reutersDictionaryMap;
+    else
+      dictionaryMap = dictionary.uottawaDictionaryMap;
     
     //  search with each query
     for (ArrayList<String> q : queries) {
@@ -126,13 +136,13 @@ class VanillaSystem {
       //  get DictionaryWords
       ArrayList<DictionaryWord> includedWords = new ArrayList<DictionaryWord>();
       for (String word : contains) {
-        includedWords.add(dictionary.getWord(word));
+        includedWords.add(dictionary.getWord(word, dictionaryMap));
         if (includedWords.get(includedWords.size()-1) == null)
           System.out.println("Null found: " + word);
       }
       ArrayList<DictionaryWord> removedWords = new ArrayList<DictionaryWord>();
       for (String word : not) {
-        removedWords.add(dictionary.getWord(word));
+        removedWords.add(dictionary.getWord(word, dictionaryMap));
         if (removedWords.get(removedWords.size()-1) == null)
           System.out.println("Null found: " + word);
       }
@@ -215,7 +225,7 @@ class VanillaSystem {
   
   
   //  an entered query is turned into queries and then queried on the dictionary to turn back relevent pages (array of the document IDs)
-  static int[] vectorSearchWithQuery(String query) {
+  static int[] vectorSearchWithQuery(String query, boolean reuters) {  //  if reuters is true, use the reuters dictionary and documents; otherwise, use the uottawa classes
     //  get queries
     String[] queries = vectorQueryProcessing.processQuery(query);
     
@@ -226,9 +236,23 @@ class VanillaSystem {
     }
     
     
+    //  get hashmap
+    HashMap<String, DictionaryWord> dictionaryMap;
+    if (reuters)
+      dictionaryMap = dictionary.reutersDictionaryMap;
+    else
+      dictionaryMap = dictionary.uottawaDictionaryMap;
+    
+    //  get hashmap
+    ArrayList<ProperDocument> documents;
+    if (reuters)
+      documents = dictionary.reutersDocumentList;
+    else
+      documents = dictionary.uottawaDocumentList;
+    
     //  document weights
-    float[][] weightVectors = new float[documents.length][];
-    for (int i = 0; i < documents.length; i++) {
+    float[][] weightVectors = new float[documents.size()][];
+    for (int i = 0; i < documents.size(); i++) {
       weightVectors[i] = new float[queries.length];
     }
     
@@ -236,9 +260,9 @@ class VanillaSystem {
     ArrayList<DocumentWeight> weights = new ArrayList<DocumentWeight>();
     
     //  set the weights for each document for all words
-    for (int i = 0; i < documents.length; i++) {
+    for (int i = 0; i < documents.size(); i++) {
       for (int j = 0; j < queries.length; j++) {
-        weightVectors[i][j] = dictionary.weight(dictionary.getWord(queries[j]), i);
+        weightVectors[i][j] = dictionary.weight(dictionary.getWord(queries[j], dictionaryMap), i);
       }
       //  normalize vectors
       //  get total

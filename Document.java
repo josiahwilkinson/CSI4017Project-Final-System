@@ -23,6 +23,10 @@ class RawDocument {
   RawDocument(int i) {
     id = i;
   }
+  RawDocument(int i, String t) {
+    id = i;
+    title = t;
+  }
   
   void addTitle(String t) {
     title = t;

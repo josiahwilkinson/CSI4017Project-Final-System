@@ -34,11 +34,13 @@ class Dictionary {
   //  static ArrayList<DictionaryWord> words = new ArrayList<DictionaryWord>();
   
   static HashMap<String, DictionaryWord> reutersDictionaryMap = new HashMap<String, DictionaryWord>();
+  static HashMap<String, DictionaryWord> uottawaDictionaryMap = new HashMap<String, DictionaryWord>();
   
+  static ArrayList<ProperDocument> reutersDocumentList = new ArrayList<ProperDocument>();
+  static ArrayList<ProperDocument> uottawaDocumentList = new ArrayList<ProperDocument>();
   
   public static void main(String args[]) {
-    ProperDocument[] documents = new ProperDocument[0];
-    createDictionary(documents);
+    createDictionary();
   }
   
   
@@ -49,10 +51,12 @@ class Dictionary {
   }
   
   
-  public static ProperDocument[] createDictionary(ProperDocument[] documents) {
-    
-    
-    ArrayList<ProperDocument> documentList = new ArrayList<ProperDocument>();
+  public static void createDictionary() {
+    createReutersDictionary();
+    createUottawaDictionary();
+  }
+  
+  public static void createReutersDictionary() {
     
     //  preprocessing
     try {
@@ -248,10 +252,10 @@ class Dictionary {
         
         for (int j = 0; j < rawDocuments.size(); j++) {
           if (j%100 == 0)
-            System.out.println(j + " " + documentList.size() + " " + reutersDictionaryMap.size());
+            System.out.println(j + " " + reutersDocumentList.size() + " " + reutersDictionaryMap.size());
           //  documents[j] = new ProperDocument(rawDocuments.get(j));
           ProperDocument pd = new ProperDocument(rawDocuments.get(j));
-          documentList.add(pd);
+          reutersDocumentList.add(pd);
           //  create dictionary compiling all proper documents
           addDocument(pd, reutersDictionaryMap);
         }
@@ -282,7 +286,7 @@ class Dictionary {
           if ((int)((float)(p*mapKeyCopy.size())/total) == k+1)
             System.out.println((int)(p*total)+"%");
         }
-        for (int j = 0; j < documentList.size(); j++) {
+        for (int j = 0; j < reutersDocumentList.size(); j++) {
           if (word.posting(j) != null) {  //  check that there is the posting for the document with this as the id
             setWeight(word, j);
           }
@@ -315,159 +319,164 @@ class Dictionary {
       System.out.println("Did not work");
       System.out.println(e);
     }
-    
-    
-    
-    
-    /*
-     //  preprocessing
-     try {
-     //  create arrayList of raw documents (word bags) to be made into a dictionary later
-     ArrayList<RawDocument> rawDocuments = new ArrayList<RawDocument>();
-     boolean french = false;  //  turned on if french and ingores lines
-     int positionCounter = 1;  //  required to keep postition of words between document lines (must be 1 as 1 is subtracted)
-     //  read lines
-     //  source: https://stackoverflow.com/questions/5868369/how-to-read-a-large-text-file-line-by-line-using-java
-     File classes = new File("classes.txt");
-     BufferedReader br = new BufferedReader(new FileReader(classes));
-     String line = br.readLine();  //  get first line
-     while (line != null) {
-     //  casefold line
-     String originalLine = line;  //  copy to preserve capitals
-     line = line.toLowerCase();
-     //  process line
-     //  if it detects that the first 3 letters are "adm", "psy", or "mat", it creates a new document starting with that line
-     //  System.out.println(line);
-     if (line.length() > 8)  //  minimum length for course code
-     if (line.substring(0, 3).equals("adm") || line.substring(0, 3).equals("psy") || line.substring(0, 3).equals("mat") || line.substring(0, 3).equals("csi")) {  //  check for course code beginning
-     //  check if english course
-     if (Character.getNumericValue(line.charAt(5)) < 5) {  //  english section
-     rawDocuments.add(new RawDocument(rawDocuments.size(), line.substring(0, 8)));
-     french = false;  //  set french flag to false
-     positionCounter = 1;  //  reset positionCounter
-     }
-     //  course is french
-     else {
-     french = true;  //  turn french flag on
-     }
-     }
-     
-     //  check if currently english
-     if (!french) {
-     //  cut on spaces
-     String[] words = line.split(" ");
-     //  word/posting object
-     ArrayList<RawDocumentWord> wordPostings = new ArrayList<RawDocumentWord>();
-     //  cycle through words
-     for (int i = 0; i < words.length; i++) {
-     if (words[i].length() > 0) {
-     //  System.out.println(words[i]);
-     words[i] = cleanPunctuation(words[i]);  //  remove punctuation from a word
-     //  System.out.println(words[i]);
-     
-     //  now that all punctuation has bben trimmed, save to wordPostings to preserve posting (as positions will be messed up during stemming)
-     wordPostings.add(new RawDocumentWord(words[i], i+positionCounter-1));
-     
-     //  basic phrase recognition for course codes
-     //  check if the word is a course code; if so, check if next is a number and add as phrase; otherwise, disregard
-     boolean courseCode = false;
-     if (words[i].length() == 3) {  //  minimum length for course code
-     if (words[i].equals("adm") || words[i].equals("psy") || words[i].equals("mat") || words[i].equals("csi")) {  //  check for course code beginning
-     //  check if following word is there
-     if (words.length > i+1)
-     //  clean next word
-     words[i+1] = cleanPunctuation(words[i+1]);
-     //  check if next word is a number
-     if (isNumber(words[i+1])) {
-     courseCode = true;  //  set course code flag so as to know not to stem
-     //  add to current word for phrase treatment
-     words[i] += words[i+1];
-     //  wordPostings.get(i).word += words[i+1];  //  modify the word posting as well
-     wordPostings.add(new RawDocumentWord(words[i], i+positionCounter-1));  //  add course code to posting
-     }
-     }
-     }
-     
-     //  else, stem
-     if (!courseCode) {
-     
-     //  stemming
-     for (int j = 0; j < stemmingRules.length; j += 2) {
-     if (words[i].length() > stemmingRules[j].length())  //  check if within length
-     if (words[i].substring(words[i].length()-stemmingRules[j].length(), words[i].length()).equals(stemmingRules[j]))  //  check for matching ending
-     wordPostings.add(new RawDocumentWord(words[i].substring(0, words[i].length()-stemmingRules[j].length())+stemmingRules[j+1], i+positionCounter-1));  //  add new wordPosting with same posting position
-     }
-     }
-     
-     }
-     //  otherwise, if a 0 length word was found (likely some double space or punction turned to nothing), then decrement positionCounter so that it will be skipped in the position counting for posting
-     else {
-     positionCounter--;
-     }
-     }
-     //  send off list of words to raw document
-     rawDocuments.get(rawDocuments.size()-1).addWords(wordPostings);
-     
-     //  add line to document
-     rawDocuments.get(rawDocuments.size()-1).addLine(originalLine);
-     
-     //  add length to position counter
-     positionCounter += words.length;
-     }
-     
-     //  get next line
-     line = br.readLine();
-     }
-     
-     
-     
-     //  all documents have been scanned and stored as RawDocuments with RawDocumentWord word/postings
-     //  now, create proper documents from raw documents (RawDocumentWord to DictionaryWord)
-     documents = new ProperDocument[rawDocuments.size()];
-     for (int i = 0; i < rawDocuments.size(); i++) {
-     documents[i] = new ProperDocument(rawDocuments.get(i));
-     //  create dictionary compiling all proper documents
-     addDocument(documents[i]);
-     }
-     
-     //  print out document 1 (0)
-     //  documents[0].printDocument();
-     
-     System.out.println();
-     System.out.println();
-     
-     //  print out dictionary
-     System.out.println("Finished constructing dictionary");
-     System.out.println();
-     //  dictionary.printDictionary();
-     
-     
-     
-     
-     
-     //  set weights for all postings
-     System.out.println("adding weights to dictionary");
-     System.out.println();
-     for (DictionaryWord word : words) {
-     for (int i = 0; i < documents.length; i++) {
-     if (word.posting(i) != null) {  //  check that there is the posting for the document with this as the id
-     setWeight(word, i);
-     }
-     }
-     }
-     System.out.println("finished adding weights to dictionary");
-     System.out.println();
-     
-     
-     }
-     catch (Exception e) {
-     System.out.println("Did not work");
-     System.out.println(e);
-     }
-     */
-    
-    //  return resulting documents
-    return documents;
+  }
+  
+  
+  
+  
+  public static void createUottawaDictionary() {
+    //  preprocessing
+    try {
+      
+      //  create arrayList of raw documents (word bags) to be made into a dictionary later
+      ArrayList<RawDocument> rawDocuments = new ArrayList<RawDocument>();
+      
+      boolean french = false;  //  turned on if french and ingores lines
+      int positionCounter = 1;  //  required to keep postition of words between document lines (must be 1 as 1 is subtracted)
+      //  read lines
+      //  source: https://stackoverflow.com/questions/5868369/how-to-read-a-large-text-file-line-by-line-using-java
+      File classes = new File("classes.txt");
+      BufferedReader br = new BufferedReader(new FileReader(classes));
+      String line = br.readLine();  //  get first line
+      while (line != null) {
+        //  casefold line
+        String originalLine = line;  //  copy to preserve capitals
+        line = line.toLowerCase();
+        //  process line
+        //  if it detects that the first 3 letters are "adm", "psy", or "mat", it creates a new document starting with that line
+        //  System.out.println(line);
+        if (line.length() > 8)  //  minimum length for course code
+          if (line.substring(0, 3).equals("adm") || line.substring(0, 3).equals("psy") || line.substring(0, 3).equals("mat") || line.substring(0, 3).equals("csi")) {  //  check for course code beginning
+          //  check if english course
+          if (Character.getNumericValue(line.charAt(5)) < 5) {  //  english section
+            rawDocuments.add(new RawDocument(rawDocuments.size(), line.substring(0, 8)));
+            french = false;  //  set french flag to false
+            positionCounter = 1;  //  reset positionCounter
+          }
+          //  course is french
+          else {
+            french = true;  //  turn french flag on
+          }
+        }
+        
+        //  check if currently english
+        if (!french) {
+          //  cut on spaces
+          String[] words = line.split(" ");
+          //  word/posting object
+          ArrayList<String> wordPostings = new ArrayList<String>();
+          //  cycle through words
+          for (int i = 0; i < words.length; i++) {
+            if (words[i].length() > 0) {
+              //  System.out.println(words[i]);
+              words[i] = cleanPunctuation(words[i]);  //  remove punctuation from a word
+              //  System.out.println(words[i]);
+              
+              //  now that all punctuation has bben trimmed, save to wordPostings to preserve posting (as positions will be messed up during stemming)
+              wordPostings.add(words[i]);
+              
+              //  basic phrase recognition for course codes
+              //  check if the word is a course code; if so, check if next is a number and add as phrase; otherwise, disregard
+              boolean courseCode = false;
+              if (words[i].length() == 3) {  //  minimum length for course code
+                if (words[i].equals("adm") || words[i].equals("psy") || words[i].equals("mat") || words[i].equals("csi")) {  //  check for course code beginning
+                  //  check if following word is there
+                  if (words.length > i+1)
+                    //  clean next word
+                    words[i+1] = cleanPunctuation(words[i+1]);
+                  //  check if next word is a number
+                  if (isNumber(words[i+1])) {
+                    courseCode = true;  //  set course code flag so as to know not to stem
+                    //  add to current word for phrase treatment
+                    words[i] += words[i+1];
+                    //  wordPostings.get(i).word += words[i+1];  //  modify the word posting as well
+                    wordPostings.add(words[i]);  //  add course code to posting
+                  }
+                }
+              }
+              
+              //  else, stem
+              if (!courseCode) {
+                
+                //  stemming
+                for (int j = 0; j < stemmingRules.length; j += 2) {
+                  if (words[i].length() > stemmingRules[j].length())  //  check if within length
+                    if (words[i].substring(words[i].length()-stemmingRules[j].length(), words[i].length()).equals(stemmingRules[j]))  //  check for matching ending
+                    wordPostings.add(words[i].substring(0, words[i].length()-stemmingRules[j].length())+stemmingRules[j+1]);  //  add new wordPosting with same posting position
+                }
+              }
+              
+            }
+            //  otherwise, if a 0 length word was found (likely some double space or punction turned to nothing), then decrement positionCounter so that it will be skipped in the position counting for posting
+            else {
+              positionCounter--;
+            }
+          }
+          //  send off list of words to raw document
+          rawDocuments.get(rawDocuments.size()-1).addWords(wordPostings);
+          
+          //  add line to document
+          rawDocuments.get(rawDocuments.size()-1).addLine(originalLine);
+          
+          //  add length to position counter
+          positionCounter += words.length;
+        }
+        
+        //  get next line
+        line = br.readLine();
+      }
+      
+      
+      
+      //  all documents have been scanned and stored as RawDocuments with RawDocumentWord word/postings
+      //  now, create proper documents from raw documents (RawDocumentWord to DictionaryWord)
+      for (int i = 0; i < rawDocuments.size(); i++) {
+        uottawaDocumentList.add(new ProperDocument(rawDocuments.get(i)));
+        //  create dictionary compiling all proper documents
+        addDocument(uottawaDocumentList.get(uottawaDocumentList.size()-1), uottawaDictionaryMap);
+      }
+      
+      //  print out document 1 (0)
+      //  documents[0].printDocument();
+      
+      System.out.println();
+      System.out.println();
+      
+      //  print out dictionary
+      System.out.println("Finished constructing dictionary");
+      System.out.println();
+      //  dictionary.printDictionary();
+      
+      
+      
+      
+      
+      //  for (DictionaryWord word : new ArrayList<DictionaryWord>(reutersDictionaryMap.values())) {
+      //  ArrayList<DictionaryWord> mapCopy = new ArrayList<DictionaryWord>(reutersDictionaryMap.values());
+      ArrayList<String> mapKeyCopy = new ArrayList<String>(uottawaDictionaryMap.keySet());
+      for (int k = 0; k < mapKeyCopy.size(); k++) {
+        DictionaryWord word = uottawaDictionaryMap.get(mapKeyCopy.get(k));
+        //  status update
+        float total = 20;
+        for (float p = 1; p < total+1; p++) {
+          if ((int)((float)(p*mapKeyCopy.size())/total) == k+1)
+            System.out.println((int)(p*total)+"%");
+        }
+        for (int j = 0; j < uottawaDocumentList.size(); j++) {
+          if (word.posting(j) != null) {  //  check that there is the posting for the document with this as the id
+            setWeight(word, j);
+          }
+        }
+      }
+      System.out.println("finished adding weights to dictionary");
+      System.out.println();
+      
+      
+    }
+    catch (Exception e) {
+      System.out.println("Did not work");
+      System.out.println(e);
+    }
   }
   
   
@@ -572,7 +581,7 @@ class Dictionary {
   
   
   //  integrates the Proper document into the dictionary
-  static void addDocument(ProperDocument doc,  HashMap<String, DictionaryWord> reutersDictionaryMap) {
+  static void addDocument(ProperDocument doc, HashMap<String, DictionaryWord> dictionaryMap) {
     //  scan all dictionary words in doc
     //  for (DictionaryWord docWord : doc.words) {
     for (int i = 0; i < doc.words.size(); i++) {
@@ -593,15 +602,15 @@ class Dictionary {
        */
       
       //  check for matching word in dictionary
-      if (reutersDictionaryMap.containsKey(doc.words.get(i).word)) {
-        reutersDictionaryMap.get(doc.words.get(i).word).addPosting(doc.words.get(i).postings.get(0));
-        doc.words.add(i, reutersDictionaryMap.get(doc.words.get(i).word));  //  add DictionaryWord object as reference so as to free up memory
+      if (dictionaryMap.containsKey(doc.words.get(i).word)) {
+        dictionaryMap.get(doc.words.get(i).word).addPosting(doc.words.get(i).postings.get(0));
+        doc.words.add(i, dictionaryMap.get(doc.words.get(i).word));  //  add DictionaryWord object as reference so as to free up memory
         doc.words.remove((i+1));  //  remove old DictionaryWord object so as to free up memory
       }
       //  otherwise, add it
       else {
         DictionaryWord dw = new DictionaryWord(doc.words.get(i).word);
-        reutersDictionaryMap.put(doc.words.get(i).word, dw);
+        dictionaryMap.put(doc.words.get(i).word, dw);
         dw.addPosting(doc.words.get(i).postings.get(0));
         doc.words.add(i, dw);  //  change DictionaryWord object into reference so as to free up memory
         doc.words.remove((i+1));  //  remove old DictionaryWord object so as to free up memory
@@ -610,15 +619,10 @@ class Dictionary {
     }
   }
   
-  //  returns true if the dictionary contains the input word
-  boolean hasWord(String w) {
-    return reutersDictionaryMap.containsKey(w);
-  }
-  
   //  returns the DictionaryWord matching the input word
-  DictionaryWord getWord(String w) {
-    if (hasWord(w))
-      return reutersDictionaryMap.get(w);
+  DictionaryWord getWord(String w, HashMap<String, DictionaryWord> dictionaryMap) {
+    if (dictionaryMap.containsKey(w))
+      return dictionaryMap.get(w);
     return null;
   }
   
