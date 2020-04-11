@@ -19,9 +19,10 @@
        private JPanel panel = new JPanel();
        private JScrollPane scrollPane = new JScrollPane(result);
        private VanillaSystem Vanilla = new VanillaSystem();
-       private SpellCorrector correct= new SpellCorrector(Vanilla.dictionary);
-       String[] choices = { "UOttawa","Reuters"};
        boolean reuters=false;
+       private SpellCorrector correct= new SpellCorrector(Vanilla.dictionary,reuters);
+       String[] choices = { "UOttawa","Reuters"};
+       
        final JComboBox<String> collection = new JComboBox<String>(choices);
        int index[];
        String listnew[];
@@ -115,7 +116,7 @@
 
        
           }}catch(Exception e) {
-            
+            System.out.println(e);
            JOptionPane.showMessageDialog(null,"No results");
 
           }
@@ -199,8 +200,16 @@
              //used from https://www.tutorialspoint.com/how-can-we-implement-a-long-text-of-the-joptionpane-message-dialog-in-java
              JTextArea jta = new JTextArea(20, 50);
              if(reuters){
-                jta.setText(Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).title+"\n\n"+
-                         printdescription(Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).description.split("  ")));
+                jta.setText("Title: "+Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).title+"\n\n"+
+                            "Date: " +Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).date+"\n"+
+                            "Topics: "+Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).topics+"\n"+
+                            "Places: "+Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).places+"\n"+
+                            "People: "+Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).people+"\n"+
+                            "Orgs: "+Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).orgs+"\n"+
+                            "Exchanges: "+ Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).exchanges+"\n"+
+                            "Companies: "+ Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).companies+"\n"+
+                            "Dateline: "+Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).dateline+"\n"+
+                            "Description:"+printdescription(Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).description.split("  ")));
              }else{
                  jta.setText(Vanilla.dictionary.uottawaDocumentList.get(index[result.getSelectedRow()]).title+"\n\n"+
                          printdescription(Vanilla.dictionary.uottawaDocumentList.get(index[result.getSelectedRow()]).description.split("  ")));

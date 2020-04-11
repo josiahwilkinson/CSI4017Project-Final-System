@@ -2,6 +2,7 @@ import java.util.ArrayList;
 
 public class SpellCorrector {
   private Dictionary dict;
+  boolean reuter;
   ArrayList<String> suggestions = new ArrayList<String>();
   
   
@@ -9,17 +10,17 @@ public class SpellCorrector {
   
   
   
-  public SpellCorrector(Dictionary d) {
+  public SpellCorrector(Dictionary d,boolean reuters) {
     this.dict=d;
-    
+    this.reuter=reuters;
   }
   
   
   
   public ArrayList<String> getSuggestions(String word){
     //set min editdistance to compare 
-    
     /*
+    
     int initial=editDistDP(word,dict.words.get(0).word,word.length(),dict.words.get(0).word.length());
     
     //runs through dictionary to get suggestions
