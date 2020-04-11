@@ -63,6 +63,10 @@ public class SpellCorrector {
     return false;
     
   }
+  static int min(int x, int y, int z) 
+  { 
+    return Math.min(Math.min(x, y), z);
+  } 
   
   
   
