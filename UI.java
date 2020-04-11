@@ -21,7 +21,7 @@
        private VanillaSystem Vanilla = new VanillaSystem();
        private SpellCorrector correct= new SpellCorrector(Vanilla.dictionary);
        String[] choices = { "UOttawa","Reuters"};
-       boolean reuters;
+       boolean reuters=false;
        final JComboBox<String> collection = new JComboBox<String>(choices);
        int index[];
        String listnew[];
@@ -66,13 +66,17 @@
            
             search.setText(info); 
             
-            index=VanillaSystem.booleanSearchWithQuery(info,reuters);
+            index=Vanilla.booleanSearchWithQuery(info,reuters);
            
-      for(int i:index) {
-               
-            model.addRow(new Object [] {VanillaSystem.documents[i].title});
-               
-      }
+            for(int i:index) {
+                if(reuters){
+                  model.addRow(new Object [] {Vanilla.dictionary.reutersDocumentList.get(i).title});
+                }else{
+                  model.addRow(new Object [] {Vanilla.dictionary.uottawaDocumentList.get(i).title});
+
+                }
+                     
+            }
         
            
          }else if(type==0){
@@ -97,17 +101,21 @@
               
      }
             search.setText(info); 
-            index=VanillaSystem.vectorSearchWithQuery(info,reuters);
+            index=Vanilla.vectorSearchWithQuery(info,reuters);
            
-       for(int i:index) {
-            model.addRow(new Object [] {VanillaSystem.documents[i].title});
-               
-      }
-        
+             for(int i:index) {
+              if(reuters){
+                  model.addRow(new Object [] {Vanilla.dictionary.reutersDocumentList.get(i).title});
+                }else{
+                  model.addRow(new Object [] {Vanilla.dictionary.uottawaDocumentList.get(i).title});
+
+                }      
+            }
+              
 
        
           }}catch(Exception e) {
-
+            
            JOptionPane.showMessageDialog(null,"No results");
 
           }
@@ -190,10 +198,14 @@
              
              //used from https://www.tutorialspoint.com/how-can-we-implement-a-long-text-of-the-joptionpane-message-dialog-in-java
              JTextArea jta = new JTextArea(20, 50);
-             
-             jta.setText(Vanilla.documents[index[result.getSelectedRow()]].title+"\n\n"+
-                         printdescription(Vanilla.documents[index[result.getSelectedRow()]].description.split("  ")));
-             
+             if(reuters){
+                jta.setText(Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).title+"\n\n"+
+                         printdescription(Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).description.split("  ")));
+             }else{
+                 jta.setText(Vanilla.dictionary.uottawaDocumentList.get(index[result.getSelectedRow()]).title+"\n\n"+
+                         printdescription(Vanilla.dictionary.uottawaDocumentList.get(index[result.getSelectedRow()]).description.split("  ")));
+
+             }
              jta.setEditable(false);
              jta.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
              JScrollPane jsp = new JScrollPane(jta);
