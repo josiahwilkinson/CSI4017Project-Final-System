@@ -17,15 +17,14 @@ public class SpellCorrector {
   
   public SpellCorrector(Dictionary d) {
     this.dict=d;
-    //  this.reuter=reuters;
+   
   }
   
   
   
   public ArrayList<String> getSuggestions(String word, boolean reuters){
     //set min editdistance to compare 
-    System.out.println();
-    System.out.println("getting suggestions for: \"" + word + "\"");
+   
     
     ArrayList<String> suggestions=new ArrayList<String>();
     
@@ -72,29 +71,7 @@ public class SpellCorrector {
     return false;
     
     
-    /*
-     if(this.reuter){
-     for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.reutersDictionaryMap.values())) {
-     if(w.word.equals(word)){
-     return true;
-     
-     }
-     
-     }
-     return false;
-     
-     }else{
-     for(DictionaryWord w: new ArrayList<DictionaryWord>(dict.uottawaDictionaryMap.values())) {
-     if(w.word.equals(word)){
-     return true;
-     
-     }
-     
-     }
-     return false;
-     
-     }
-     */
+  
   }
   static int min(int x, int y, int z) 
   { 

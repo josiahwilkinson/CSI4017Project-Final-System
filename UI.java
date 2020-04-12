@@ -14,7 +14,7 @@
        private JTextField search = new JTextField(30);
        private JButton VSMButton = new JButton("VSM Search");
        private JButton BooleanButton = new JButton("Boolean Search");
-
+       private JButton relevance = new JButton("Relevance");
        private JTable result = new JTable();
        private JPanel panel = new JPanel();
        private JScrollPane scrollPane = new JScrollPane(result);
@@ -41,6 +41,9 @@
          SpellCorrector correct= new SpellCorrector(Vanilla.dictionary);
          DefaultTableModel model = new DefaultTableModel();
          model.addColumn("Titles");
+
+
+        
          try {
          if(type==1){
            
@@ -103,7 +106,7 @@
      }
             search.setText(info); 
             index=Vanilla.vectorSearchWithQuery(info,reuters);
-           
+  
              for(int i:index) {
               if(reuters){
                   model.addRow(new Object [] {Vanilla.dictionary.reutersDocumentList.get(i).title});
@@ -115,8 +118,12 @@
               
 
        
-          }}catch(Exception e) {
-            System.out.println(e);
+          }
+
+        
+
+        }catch(Exception e) {
+            
            JOptionPane.showMessageDialog(null,"No results");
 
           }
@@ -127,7 +134,88 @@
          
      }  
 
+      public void relevancemodel(){
+        try{
+    if(index.length!=0){
+    //ADD SCROLLPANE
+    JScrollPane scroll=new JScrollPane();
+    scroll.setBounds(70,80,600,200);
+    getContentPane().add(scroll);
 
+    //THE TABLE
+    final JTable table=new JTable();
+    scroll.setViewportView(table);
+
+    //THE MODEL OF OUR TABLE
+    DefaultTableModel model=new DefaultTableModel()
+    {
+      public Class<?> getColumnClass(int column)
+      {
+        switch(column)
+        {
+        case 0:
+          return Boolean.class;
+        case 1:
+          return String.class;
+
+          default:
+            return String.class;
+        }
+      }
+    };
+
+    //ASSIGN THE MODEL TO TABLE
+    table.setModel(model);
+
+    model.addColumn("Select");
+    model.addColumn("Document");
+
+   
+    for(int i=0;i<=index.length-1;i++){
+    
+      model.addRow(new Object[0]);
+      model.setValueAt(false,i,0);
+      if(reuters){
+                  model.setValueAt(Vanilla.dictionary.reutersDocumentList.get(index[i]).title,i,1);
+                }else{
+                  model.setValueAt(Vanilla.dictionary.uottawaDocumentList.get(index[i]).title,i,1);
+
+                }     
+     
+    }
+JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptionPane.PLAIN_MESSAGE);
+    //OBTAIN SELECTED ROW
+    JButton btn=new JButton("Get Selected");
+    btn.addActionListener(new ActionListener() {
+
+      @Override
+      public void actionPerformed(ActionEvent arg0) {
+        // TODO Auto-generated method stub
+
+        //GET SELECTED ROW
+        for(int i=0;i<table.getRowCount();i++)
+        {
+          Boolean checked=Boolean.valueOf(table.getValueAt(i, 0).toString());
+          String col=table.getValueAt(i, 1).toString();
+
+          //DISPLAY
+          if(checked)
+          {
+            JOptionPane.showMessageDialog(null, col);
+          }
+        }
+
+      }
+    });
+
+
+  }}catch(Exception e){
+    JOptionPane.showMessageDialog(null, "No Query Entered");
+
+  }}
+
+
+  
 
     
        public String makeDialog(String outerword,ArrayList<String> choices) {
@@ -256,6 +344,7 @@
          panel.add(BooleanButton,BorderLayout.WEST);
          panel.add(scrollPane);
          panel.add(collection);
+         panel.add(relevance);
 
          add(panel);
          
@@ -265,7 +354,7 @@
        public void Table() {
          VSMButton.addActionListener(e -> result.setModel(makeModel(search.getText(),0, reuters)));
          BooleanButton.addActionListener(f -> result.setModel(makeModel(search.getText(),1, reuters)));
-         
+         relevance.addActionListener(g-> relevancemodel());
           ActionListener cbActionListener = new ActionListener() {
            
             public void actionPerformed(ActionEvent e) {
