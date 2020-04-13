@@ -46,6 +46,7 @@
        
        public static void main(String[] args) {
          new UI("UOttawa Course Finder");
+         System.out.println("Created UI");
        }
        
        
@@ -143,6 +144,8 @@
         }catch(Exception e) {
             
            JOptionPane.showMessageDialog(null,"No results");
+           
+           System.out.println("Issue with UI");
 
           }
              return model;
@@ -202,7 +205,7 @@
                    
      
     }
-JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptionPane.PLAIN_MESSAGE);
+    JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptionPane.PLAIN_MESSAGE);
     //OBTAIN SELECTED ROW
     JButton btn=new JButton("Get Selected");
     btn.addActionListener(new ActionListener() {
@@ -230,6 +233,7 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
 
   }}catch(Exception e){
     JOptionPane.showMessageDialog(null, "No Query Entered");
+    System.out.println("Issue with UI");
 
   }}
 
@@ -305,19 +309,30 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
          super(title);
          Vanilla.createWordDictionary();
          
+         System.out.println("Made it 1");
+         
+         
          setSize(650, 625);
          setResizable(false);
          scrollPane.setPreferredSize(new Dimension (600,500)); 
          addComponents();
          Table();
          
+         System.out.println("Made it 1.1");
+         
          //used from https://stackoverflow.com/questions/10128064/jtable-selected-row-click-event
          result.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
            public void valueChanged(ListSelectionEvent event) {
+         
+         System.out.println("Made it 1.5");
+         
              if(result.getSelectedRow()>=0){
              
              //used from https://www.tutorialspoint.com/how-can-we-implement-a-long-text-of-the-joptionpane-message-dialog-in-java
              JTextArea jta = new JTextArea(20, 50);
+             
+         System.out.println("Made it 2");
+         
              if(reuters){
                 jta.setText("Title: "+Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).title+"\n\n"+
                             "Date: " +Vanilla.dictionary.reutersDocumentList.get(index[result.getSelectedRow()]).date+"\n"+
@@ -334,6 +349,9 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
                          printdescription(Vanilla.dictionary.uottawaDocumentList.get(index[result.getSelectedRow()]).description.split("  ")));
 
              }
+             
+         System.out.println("Made it 3");
+         
              jta.setEditable(false);
              jta.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
              JScrollPane jsp = new JScrollPane(jta);
@@ -343,9 +361,12 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
              JOptionPane.showMessageDialog(null, jsp);
              
              
-             
+         System.out.println("Made it 4");
+         
            }}
          });
+         
+         System.out.println("Made it 5");
        }
        
        
