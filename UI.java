@@ -3,14 +3,15 @@
      import javax.swing.event.ListSelectionListener;
      import javax.swing.table.DefaultTableModel;
      import javax.swing.table.TableModel;
-   
+    
      import java.awt.*;
      import java.util.ArrayList;
      import java.awt.event.ActionListener;
      import java.awt.event.ActionEvent;
    
      public class UI extends JFrame {
-    
+      
+
        private JTextField search = new JTextField(30);
        private JButton VSMButton = new JButton("VSM Search");
        private JButton BooleanButton = new JButton("Boolean Search");
@@ -256,6 +257,11 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
            
        }
          
+       public boolean needexpansion(){
+
+
+        
+       }
        
    
        
