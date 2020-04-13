@@ -3,11 +3,13 @@
      import javax.swing.event.ListSelectionListener;
      import javax.swing.table.DefaultTableModel;
      import javax.swing.table.TableModel;
-    
+     import java.util.ArrayList;
      import java.awt.*;
      import java.util.ArrayList;
      import java.awt.event.ActionListener;
      import java.awt.event.ActionEvent;
+     import java.io.*; 
+import java.util.*; 
    
      public class UI extends JFrame {
       
@@ -20,6 +22,7 @@
        private JPanel panel = new JPanel();
        private JScrollPane scrollPane = new JScrollPane(result);
        private VanillaSystem Vanilla = new VanillaSystem();
+       ArrayList<Relevance>storage= new ArrayList<Relevance>();
        boolean reuters=false;
        
        String[] choices = { "UOttawa","Reuters"};
@@ -189,33 +192,41 @@
                    
      
     }
-JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptionPane.PLAIN_MESSAGE);
-    //OBTAIN SELECTED ROW
-    JButton btn=new JButton("Get Selected");
-    btn.addActionListener(new ActionListener() {
 
-      @Override
-      public void actionPerformed(ActionEvent arg0) {
-        // TODO Auto-generated method stub
+int returns=JOptionPane.showOptionDialog(null, scroll, "Which Documents are relevant ", JOptionPane.DEFAULT_OPTION,
+        JOptionPane.INFORMATION_MESSAGE, null, null, null);
+    //OBTAIN SELECTED ROW
+   
+   
+    ArrayList<Integer> relevant=new ArrayList<Integer>();
+    ArrayList<Integer> nonrelevant=new ArrayList<Integer>();
+     Relevance thisquery = new Relevance(search.getText(),relevant,nonrelevant);
+   
+if(returns==0)
+          {
 
         //GET SELECTED ROW
         for(int i=0;i<table.getRowCount();i++)
         {
           Boolean checked=Boolean.valueOf(table.getValueAt(i, 0).toString());
-          String col=table.getValueAt(i, 1).toString();
-
-          //DISPLAY
-          if(checked)
-          {
-            JOptionPane.showMessageDialog(null, col);
+          if(checked){
+              relevant.add(index[i]);
+          }else{
+              nonrelevant.add(index[i]);
           }
-        }
 
-      }
-    });
+      } 
+
+    storage.add(thisquery);
+
+    
+    }  
+
+      
+  
 
 
-  }}catch(Exception e){
+ } }catch(Exception e){
     JOptionPane.showMessageDialog(null, "No Query Entered");
 
   }}
@@ -265,6 +276,9 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
          //TAKEN FROM https://stackoverflow.com/questions/8689122/joptionpane-yes-no-options-confirm-dialog-box-issue
          int dialogButton = JOptionPane.YES_NO_OPTION;
          int dialogResult = JOptionPane.showConfirmDialog(this, "Would you like to expand the query by adding " + synonym + " to " + word + "?", "Expansion", dialogButton);
+
+
+
          if(dialogResult == 0) {
            return true;
          } else {
