@@ -1,8 +1,14 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.io.*;
+import java.io.FileNotFoundException; 
+import java.lang.Math; 
+import java.util.HashMap;
+
 
 public class SpellCorrector {
   private Dictionary dict;
-  ArrayList<String> suggestions = new ArrayList<String>();
+  //  boolean reuter;
   
   
   
@@ -11,63 +17,65 @@ public class SpellCorrector {
   
   public SpellCorrector(Dictionary d) {
     this.dict=d;
-    
+   
   }
   
   
   
-  public ArrayList<String> getSuggestions(String word){
+  public ArrayList<String> getSuggestions(String word, boolean reuters){
     //set min editdistance to compare 
+   
     
-    int initial=editDistDP(word,dict.words.get(0).word,word.length(),dict.words.get(0).word.length());
+    ArrayList<String> suggestions=new ArrayList<String>();
     
-    //runs through dictionary to get suggestions
-    for(DictionaryWord w: dict.words) {
-      if(editDistDP(word,w.word,word.length(),w.word.length())<initial) {
-        suggestions=new ArrayList<String>();
-        suggestions.add(w.word);
-        initial=editDistDP(word,w.word,word.length(),w.word.length());
+    ArrayList<String> dictionary;
+    if (reuters)
+      dictionary = new ArrayList<String>(dict.reutersDictionaryMap.keySet());
+    else
+      dictionary = new ArrayList<String>(dict.uottawaDictionaryMap.keySet());
+    
+    
+    
+    int initial = editDistDP(word, dictionary.get(0), word.length(), dictionary.get(0).length());;
+    for (int i = 0; i < dictionary.size(); i++) {
+      String w = dictionary.get(i);
         
-        
-        
-        
-      }else if(editDistDP(word,w.word,word.length(),w.word.length())==initial) {
-        suggestions.add(w.word);
-        
-        
-        
+      if (editDistDP(word, w,word.length(), w.length()) < initial) {
+        suggestions.add(w);
+        initial = editDistDP(word, w,word.length(), w.length());
       }
-      
-      
-      
+      else if(editDistDP(word, w, word.length(), w.length()) == initial) {
+        suggestions.add(w);
+      }
     }
-    System.out.println(suggestions.toString());
-    return suggestions; 
-  }
-  
-  
-  
-  
-  
-  public boolean inDictionary(String word){
-    for(DictionaryWord w: dict.words) {
-      if(w.word.equals(word)){
-         return true;
     
+    System.out.println("suggestions: " + suggestions.toString());
+    return suggestions;
   }
-     
+  
+  
+  
+  
+  
+  public boolean inDictionary(String word, boolean reuters){
+    
+    if (reuters) {
+      if (dict.reutersDictionaryMap.containsKey(word))
+        return true;
     }
+    
+    else { if (dict.uottawaDictionaryMap.containsKey(word))
+      return true;
+    }
+    
     return false;
+    
+    
   
   }
   static int min(int x, int y, int z) 
   { 
-    if (x <= y && x <= z) 
-      return x; 
-    if (y <= x && y <= z) 
-      return y; 
-    else
-      return z; 
+    return Math.min(Math.min(x, y), z);
   } 
   
   
@@ -107,7 +115,6 @@ public class SpellCorrector {
     
     return dp[m][n]; 
   } 
-  
   
   
   

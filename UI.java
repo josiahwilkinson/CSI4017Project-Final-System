@@ -57,7 +57,7 @@
                word=word.substring(1,word.length());
              }
               old=word;
-             if(!correct.inDictionary(word, reuters)){
+             if(!correct.inWordDictionary(word, reuters)){
                //if not in dictionary popup with suggestions to replace. once clicked, replace word with suggestion. 
              word=makeDialog(word,correct.getSuggestions(word, reuters));              
              
@@ -94,7 +94,7 @@
                word=word.substring(1,word.length());
              }
               old=word;
-             if(!correct.inDictionary(word, reuters)){
+             if(!correct.inWordDictionary(word, reuters)){
                //if not in dictionary popup with suggestions to replace. once clicked, replace word with suggestion. 
              word=makeDialog(word,correct.getSuggestions(word, reuters));              
              
@@ -286,7 +286,7 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
        
        private UI(String title) throws HeadlessException {
          super(title);
-         Vanilla.createDictionary();
+         Vanilla.createWordDictionary();
          
          setSize(650, 625);
          setResizable(false);

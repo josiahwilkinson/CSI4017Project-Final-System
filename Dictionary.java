@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 
 //  dictionary class
-class Dictionary {
+class WordDictionary {
   
   
   
@@ -31,32 +31,32 @@ class Dictionary {
     "what's", "when's", "where's", "who's", "why's", "would"};
   
   
-  //  static ArrayList<DictionaryWord> words = new ArrayList<DictionaryWord>();
+  //  static ArrayList<WordDictionaryWord> words = new ArrayList<WordDictionaryWord>();
   
-  static HashMap<String, DictionaryWord> reutersDictionaryMap = new HashMap<String, DictionaryWord>();
-  static HashMap<String, DictionaryWord> uottawaDictionaryMap = new HashMap<String, DictionaryWord>();
+  static HashMap<String, WordDictionaryWord> reutersDictionaryMap = new HashMap<String, WordDictionaryWord>();
+  static HashMap<String, WordDictionaryWord> uottawaDictionaryMap = new HashMap<String, WordDictionaryWord>();
   
   static ArrayList<ProperDocument> reutersDocumentList = new ArrayList<ProperDocument>();
   static ArrayList<ProperDocument> uottawaDocumentList = new ArrayList<ProperDocument>();
   
   public static void main(String args[]) {
-    createDictionary();
+    createWordDictionary();
   }
   
   
   
-  Dictionary(char[] p, String[] sr) {
+  WordDictionary(char[] p, String[] sr) {
     stemmingRules = sr;
     punctuation = p;
   }
   
   
-  public static void createDictionary() {
-    createReutersDictionary();
-    createUottawaDictionary();
+  public static void createWordDictionary() {
+    createReutersWordDictionary();
+    createUottawaWordDictionary();
   }
   
-  public static void createReutersDictionary() {
+  public static void createReutersWordDictionary() {
     
     
     String originalLine = "";  //  copy to preserve capitals
@@ -369,18 +369,18 @@ class Dictionary {
       //  print out dictionary
       System.out.println("Finished constructing dictionary");
       System.out.println();
-      //  printDictionary();
+      //  printWordDictionary();
       
       
       //  set weights for all postings
       System.out.println("adding weights to dictionary");
       System.out.println();
       
-      //  for (DictionaryWord word : new ArrayList<DictionaryWord>(reutersDictionaryMap.values())) {
-      //  ArrayList<DictionaryWord> mapCopy = new ArrayList<DictionaryWord>(reutersDictionaryMap.values());
+      //  for (WordDictionaryWord word : new ArrayList<WordDictionaryWord>(reutersDictionaryMap.values())) {
+      //  ArrayList<WordDictionaryWord> mapCopy = new ArrayList<WordDictionaryWord>(reutersDictionaryMap.values());
       ArrayList<String> mapKeyCopy = new ArrayList<String>(reutersDictionaryMap.keySet());
       for (int k = 0; k < mapKeyCopy.size(); k++) {
-        DictionaryWord word = reutersDictionaryMap.get(mapKeyCopy.get(k));
+        WordDictionaryWord word = reutersDictionaryMap.get(mapKeyCopy.get(k));
         //  status update
         float total = 10;
         for (float p = 1; p < total+1; p++) {
@@ -426,7 +426,7 @@ class Dictionary {
   
   
   
-  public static void createUottawaDictionary() {
+  public static void createUottawaWordDictionary() {
     //  preprocessing
     try {
       
@@ -532,7 +532,7 @@ class Dictionary {
       
       
       //  all documents have been scanned and stored as RawDocuments with RawDocumentWord word/postings
-      //  now, create proper documents from raw documents (RawDocumentWord to DictionaryWord)
+      //  now, create proper documents from raw documents (RawDocumentWord to WordDictionaryWord)
       for (int i = 0; i < rawDocuments.size(); i++) {
         uottawaDocumentList.add(new ProperDocument(rawDocuments.get(i)));
         //  create dictionary compiling all proper documents
@@ -548,17 +548,17 @@ class Dictionary {
       //  print out dictionary
       System.out.println("Finished constructing dictionary");
       System.out.println();
-      //  dictionary.printDictionary();
+      //  dictionary.printWordDictionary();
       
       
       
       
       
-      //  for (DictionaryWord word : new ArrayList<DictionaryWord>(reutersDictionaryMap.values())) {
-      //  ArrayList<DictionaryWord> mapCopy = new ArrayList<DictionaryWord>(reutersDictionaryMap.values());
+      //  for (WordDictionaryWord word : new ArrayList<WordDictionaryWord>(reutersDictionaryMap.values())) {
+      //  ArrayList<WordDictionaryWord> mapCopy = new ArrayList<WordDictionaryWord>(reutersDictionaryMap.values());
       ArrayList<String> mapKeyCopy = new ArrayList<String>(uottawaDictionaryMap.keySet());
       for (int k = 0; k < mapKeyCopy.size(); k++) {
-        DictionaryWord word = uottawaDictionaryMap.get(mapKeyCopy.get(k));
+        WordDictionaryWord word = uottawaDictionaryMap.get(mapKeyCopy.get(k));
         //  status update
         float total = 10;
         for (float p = 1; p < total+1; p++) {
@@ -717,9 +717,9 @@ class Dictionary {
   
   
   //  integrates the Proper document into the dictionary
-  static void addDocument(ProperDocument doc, HashMap<String, DictionaryWord> dictionaryMap) {
+  static void addDocument(ProperDocument doc, HashMap<String, WordDictionaryWord> dictionaryMap) {
     //  scan all dictionary words in doc
-    //  for (DictionaryWord docWord : doc.words) {
+    //  for (WordDictionaryWord docWord : doc.words) {
     for (int i = 0; i < doc.words.size(); i++) {
       //  too slow, use hashmap
       /*
@@ -730,7 +730,7 @@ class Dictionary {
        }
        //  if match could not be found, add (shallow copy of) word to dictionary
        else {
-       DictionaryWord dw = new DictionaryWord(docWord.word);
+       WordDictionaryWord dw = new WordDictionaryWord(docWord.word);
        dw.addPosting(docWord.postings.get(0));  //  can do 0 as each document only has 1 posting (containing 1+ positions)
        words.add(dw);
        wordList.add(docWord.word);
@@ -740,32 +740,32 @@ class Dictionary {
       //  check for matching word in dictionary
       if (dictionaryMap.containsKey(doc.words.get(i).word)) {
         dictionaryMap.get(doc.words.get(i).word).addPosting(doc.words.get(i).postings.get(0));
-        doc.words.add(i, dictionaryMap.get(doc.words.get(i).word));  //  add DictionaryWord object as reference so as to free up memory
-        doc.words.remove((i+1));  //  remove old DictionaryWord object so as to free up memory
+        doc.words.add(i, dictionaryMap.get(doc.words.get(i).word));  //  add WordDictionaryWord object as reference so as to free up memory
+        doc.words.remove((i+1));  //  remove old WordDictionaryWord object so as to free up memory
       }
       //  otherwise, add it
       else {
-        DictionaryWord dw = new DictionaryWord(doc.words.get(i).word);
+        WordDictionaryWord dw = new WordDictionaryWord(doc.words.get(i).word);
         dictionaryMap.put(doc.words.get(i).word, dw);
         dw.addPosting(doc.words.get(i).postings.get(0));
-        doc.words.add(i, dw);  //  change DictionaryWord object into reference so as to free up memory
-        doc.words.remove((i+1));  //  remove old DictionaryWord object so as to free up memory
+        doc.words.add(i, dw);  //  change WordDictionaryWord object into reference so as to free up memory
+        doc.words.remove((i+1));  //  remove old WordDictionaryWord object so as to free up memory
         //  words.add(dw);
       }
     }
   }
   
-  //  returns the DictionaryWord matching the input word
-  DictionaryWord getWord(String w, HashMap<String, DictionaryWord> dictionaryMap) {
+  //  returns the WordDictionaryWord matching the input word
+  WordDictionaryWord getWord(String w, HashMap<String, WordDictionaryWord> dictionaryMap) {
     if (dictionaryMap.containsKey(w))
       return dictionaryMap.get(w);
     return null;
   }
   
   //  prints the dictionary to the console
-  static void printDictionary() {
-    System.out.println("Dictionary:");
-    for (DictionaryWord word : new ArrayList<DictionaryWord>(reutersDictionaryMap.values())) {
+  static void printWordDictionary() {
+    System.out.println("WordDictionary:");
+    for (WordDictionaryWord word : new ArrayList<WordDictionaryWord>(reutersDictionaryMap.values())) {
       System.out.println();
       System.out.print(word.word + " || ");
       for (Posting posting : word.postings) {
@@ -787,25 +787,25 @@ class Dictionary {
   
   
   
-  static float inverseDocumentFrequency(DictionaryWord word) {
+  static float inverseDocumentFrequency(WordDictionaryWord word) {
     return (float)(Math.log(reutersDictionaryMap.size()/word.totalDocuments()));
   }
   
-  static float termFrequency(DictionaryWord word, int docID) {
+  static float termFrequency(WordDictionaryWord word, int docID) {
     return (float)(Math.log(1 + word.termFrequency(docID)));
   }
   
-  static void setWeight(DictionaryWord word, int docID) {
+  static void setWeight(WordDictionaryWord word, int docID) {
     float weight = inverseDocumentFrequency(word) * termFrequency(word, docID);
     word.setWeight(weight, docID);
   }
   
   //  get weights for input document
-  static float weight(DictionaryWord word, int docID) {
+  static float weight(WordDictionaryWord word, int docID) {
     return word.weight(docID);
   }
   
   
 }
 
-//  DictionaryWord stored in main VanillaSystem 
+//  WordDictionaryWord stored in main VanillaSystem 

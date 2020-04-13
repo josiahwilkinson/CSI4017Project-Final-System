@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 
 public class SpellCorrector {
-  private Dictionary dict;
+  private WordDictionary dict;
   //  boolean reuter;
   
   
@@ -15,7 +15,7 @@ public class SpellCorrector {
   
   
   
-  public SpellCorrector(Dictionary d) {
+  public SpellCorrector(WordDictionary d) {
     this.dict=d;
    
   }
@@ -57,7 +57,7 @@ public class SpellCorrector {
   
   
   
-  public boolean inDictionary(String word, boolean reuters){
+  public boolean inWordDictionary(String word, boolean reuters){
     
     if (reuters) {
       if (dict.reutersDictionaryMap.containsKey(word))

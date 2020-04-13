@@ -5,10 +5,10 @@ import java.io.*;
 class BooleanQueryProcessing {
   
   
-  static Dictionary dictionary;
+  static WordDictionary dictionary;
   
   
-  BooleanQueryProcessing(Dictionary d) {
+  BooleanQueryProcessing(WordDictionary d) {
     dictionary = d;
   }
   

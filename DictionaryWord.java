@@ -4,13 +4,13 @@ import java.lang.Math;
 
 
 //  stores a word and postings
-class DictionaryWord {
+class WordDictionaryWord {
   
   String word;
   
   ArrayList<Posting> postings = new ArrayList<Posting>();
   
-  DictionaryWord(String w) {
+  WordDictionaryWord(String w) {
     word = w;
   }
   

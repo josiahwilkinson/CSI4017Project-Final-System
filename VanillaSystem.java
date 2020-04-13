@@ -48,7 +48,7 @@ class VanillaSystem {
   
   
   
-  static Dictionary dictionary = new Dictionary(punctuation, stemmingRules);  //  does NOT create the dictionary, merely passes through the punctuation and stemming rules
+  static WordDictionary dictionary = new WordDictionary(punctuation, stemmingRules);  //  does NOT create the dictionary, merely passes through the punctuation and stemming rules
   
   
   
@@ -70,7 +70,7 @@ class VanillaSystem {
     //  dictionary
     /*
     System.out.println("creating dictionary");
-    documents = dictionary.createDictionary(documents);
+    documents = dictionary.createWordDictionary(documents);
     System.out.println("dictionary created");
     */
     
@@ -100,9 +100,9 @@ class VanillaSystem {
   }
   
   
-  void createDictionary() {
-    //  dictionary = new Dictionary(punctuation, stemmingRules);
-    dictionary.createDictionary();
+  void createWordDictionary() {
+    //  dictionary = new WordDictionary(punctuation, stemmingRules);
+    dictionary.createWordDictionary();
   }
   
   
@@ -116,7 +116,7 @@ class VanillaSystem {
     ArrayList<Integer> docs = new ArrayList<Integer>();
     
     //  get hashmap
-    HashMap<String, DictionaryWord> dictionaryMap;
+    HashMap<String, WordDictionaryWord> dictionaryMap;
     if (reuters)
       dictionaryMap = dictionary.reutersDictionaryMap;
     else
@@ -133,14 +133,14 @@ class VanillaSystem {
         else
           contains.add(word);
       }
-      //  get DictionaryWords
-      ArrayList<DictionaryWord> includedWords = new ArrayList<DictionaryWord>();
+      //  get WordDictionaryWords
+      ArrayList<WordDictionaryWord> includedWords = new ArrayList<WordDictionaryWord>();
       for (String word : contains) {
         includedWords.add(dictionary.getWord(word, dictionaryMap));
         if (includedWords.get(includedWords.size()-1) == null)
           System.out.println("Null found: " + word);
       }
-      ArrayList<DictionaryWord> removedWords = new ArrayList<DictionaryWord>();
+      ArrayList<WordDictionaryWord> removedWords = new ArrayList<WordDictionaryWord>();
       for (String word : not) {
         removedWords.add(dictionary.getWord(word, dictionaryMap));
         if (removedWords.get(removedWords.size()-1) == null)
@@ -148,7 +148,7 @@ class VanillaSystem {
       }
       
       //  search through dictionary words
-      //  to do this, have a tracker for each DictionaryWord in both lists. If all of the docs in includeWords match, and all the docs in removedWords are higher, add the doc to the list
+      //  to do this, have a tracker for each WordDictionaryWord in both lists. If all of the docs in includeWords match, and all the docs in removedWords are higher, add the doc to the list
       int[] dictionaryTrackers = new int[includedWords.size()+removedWords.size()];
       for (int i : dictionaryTrackers)
         i = 0;
@@ -237,7 +237,7 @@ class VanillaSystem {
     
     
     //  get hashmap
-    HashMap<String, DictionaryWord> dictionaryMap;
+    HashMap<String, WordDictionaryWord> dictionaryMap;
     if (reuters)
       dictionaryMap = dictionary.reutersDictionaryMap;
     else
