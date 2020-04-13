@@ -43,7 +43,10 @@
          DefaultTableModel model = new DefaultTableModel();
          model.addColumn("Titles");
 
-
+         //  create WordNet
+         JWNL.initialize();
+         //Dictionary.getInstance();
+         
         
          try {
          if(type==1){
