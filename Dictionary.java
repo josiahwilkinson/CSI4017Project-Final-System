@@ -351,7 +351,6 @@ class WordDictionary {
       
       
       
-      
       System.out.println("checking for titles");
       System.out.print("no titles: ");
       for (int j = 0; j < reutersDocumentList.size(); j++) {
@@ -376,6 +375,7 @@ class WordDictionary {
       System.out.println("adding weights to dictionary");
       System.out.println();
       
+      /*
       //  for (WordDictionaryWord word : new ArrayList<WordDictionaryWord>(reutersDictionaryMap.values())) {
       //  ArrayList<WordDictionaryWord> mapCopy = new ArrayList<WordDictionaryWord>(reutersDictionaryMap.values());
       ArrayList<String> mapKeyCopy = new ArrayList<String>(reutersDictionaryMap.keySet());
@@ -393,6 +393,7 @@ class WordDictionary {
           }
         }
       }
+      */
       
       System.out.println("finished adding weights to dictionary");
       System.out.println();

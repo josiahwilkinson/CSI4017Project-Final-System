@@ -45,14 +45,14 @@
          model.addColumn("Titles");
 
          //  create WordNet
-       //  JWNL.initialize();
+         //JWNL.initialize();
          //Dictionary.getInstance();
          
         
          try {
          if(type==1){
            
-           ArrayList<ArrayList<String>>list=Vanilla.booleanQueryProcessing.processQuery(info,reuters, this);
+           ArrayList<ArrayList<String>>list=Vanilla.booleanQueryProcessing.processQuery(info,reuters,Vanilla.stemmingRules, this);
           listnew=Vanilla.condense(list);
            for(String word:listnew){
             
@@ -75,7 +75,7 @@
            
             search.setText(info); 
             
-            index=Vanilla.booleanSearchWithQuery(info,reuters,this);
+            index=Vanilla.booleanSearchWithQuery(info,reuters,Vanilla.stemmingRules,this);
            
             for(int i:index) {
                 if(reuters){
@@ -89,7 +89,7 @@
         
            
          }else if(type==0){
-           String[] list=Vanilla.vectorQueryProcessing.processQuery(info, this);
+           String[] list=Vanilla.vectorQueryProcessing.processQuery(info,Vanilla.stemmingRules,this);
          
            for(String word:list){
             
@@ -110,7 +110,7 @@
               
      }
             search.setText(info); 
-            index=Vanilla.vectorSearchWithQuery(info,reuters,this);
+            index=Vanilla.vectorSearchWithQuery(info,reuters,Vanilla.stemmingRules,this);
   
              for(int i:index) {
               if(reuters){
@@ -291,7 +291,10 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
        private UI(String title) throws HeadlessException {
          super(title);
          Vanilla.createWordDictionary();
-         
+        revalidate();
+         repaint();
+         setVisible(true);
+             
          setSize(650, 625);
          setResizable(false);
          scrollPane.setPreferredSize(new Dimension (600,500)); 
@@ -328,21 +331,16 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
              
              
              JOptionPane.showMessageDialog(null, jsp);
-              setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-             result.setFillsViewportHeight( true );
-             result.getTableHeader().setReorderingAllowed(false);
-             
-            revalidate();
-             repaint();
+             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+         result.setFillsViewportHeight( true );
+         result.getTableHeader().setReorderingAllowed(false);
          
-         
-         
-         
-            setVisible(true);
-             
+        
              
            }}
          });
+
+
        }
        
        

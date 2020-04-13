@@ -3,14 +3,27 @@
      import javax.swing.event.ListSelectionListener;
      import javax.swing.table.DefaultTableModel;
      import javax.swing.table.TableModel;
-   
+    
      import java.awt.*;
      import java.util.ArrayList;
      import java.awt.event.ActionListener;
      import java.awt.event.ActionEvent;
+     
+     /*
+     package net.didion.jwnl;
+     package net.didion.jwnl.*;
+     package net.didion.jwnl.dictionary;
+
+     import java.net.didion.jwnl;
+     import net.didion.jwnl;
+     import net.didion.jwnl.dictionary;
+     import net.didion.jwnl.*;
+     */
    
+     
      public class UI extends JFrame {
-    
+      
+
        private JTextField search = new JTextField(30);
        private JButton VSMButton = new JButton("VSM Search");
        private JButton BooleanButton = new JButton("Boolean Search");
@@ -33,6 +46,7 @@
        
        public static void main(String[] args) {
          new UI("UOttawa Course Finder");
+         System.out.println("Created UI");
        }
        
        
@@ -41,13 +55,18 @@
          SpellCorrector correct= new SpellCorrector(Vanilla.dictionary);
          DefaultTableModel model = new DefaultTableModel();
          model.addColumn("Titles");
-
-
-        
+         
+         //  create WordNet
+         //  JWNL.initialize();
+//  create database jwnl;
+//  java -cp jwnl.jar;utilities.jar;commons-logging.jar net.didion.jwnl.utilities.DictionaryToDatabase .\include\file-properties.xml .\include\create.sql com.mysql.jdbc.Driver jdbc:mysql://localhost/jwnl?user=jwnl&password=jwnl"
+         //Dictionary.getInstance();
+         
+         
          try {
-         if(type==1){
+           if(type==1){
            
-           ArrayList<ArrayList<String>>list=Vanilla.booleanQueryProcessing.processQuery(info);
+           ArrayList<ArrayList<String>>list=Vanilla.booleanQueryProcessing.processQuery(info,reuters, Vanilla.stemmingRules, this);
           listnew=Vanilla.condense(list);
            for(String word:listnew){
             
@@ -56,7 +75,7 @@
                word=word.substring(1,word.length());
              }
               old=word;
-             if(!correct.inDictionary(word, reuters)){
+             if(!correct.inWordDictionary(word, reuters)){
                //if not in dictionary popup with suggestions to replace. once clicked, replace word with suggestion. 
              word=makeDialog(word,correct.getSuggestions(word, reuters));              
              
@@ -70,7 +89,7 @@
            
             search.setText(info); 
             
-            index=Vanilla.booleanSearchWithQuery(info,reuters);
+            index=Vanilla.booleanSearchWithQuery(info,reuters, Vanilla.stemmingRules,this);
            
             for(int i:index) {
                 if(reuters){
@@ -84,7 +103,7 @@
         
            
          }else if(type==0){
-           String[] list=Vanilla.vectorQueryProcessing.processQuery(info);
+           String[] list=Vanilla.vectorQueryProcessing.processQuery(info, Vanilla.stemmingRules, this);
          
            for(String word:list){
             
@@ -93,7 +112,7 @@
                word=word.substring(1,word.length());
              }
               old=word;
-             if(!correct.inDictionary(word, reuters)){
+             if(!correct.inWordDictionary(word, reuters)){
                //if not in dictionary popup with suggestions to replace. once clicked, replace word with suggestion. 
              word=makeDialog(word,correct.getSuggestions(word, reuters));              
              
@@ -105,7 +124,7 @@
               
      }
             search.setText(info); 
-            index=Vanilla.vectorSearchWithQuery(info,reuters);
+            index=Vanilla.vectorSearchWithQuery(info,reuters, Vanilla.stemmingRules,this);
   
              for(int i:index) {
               if(reuters){
@@ -125,6 +144,8 @@
         }catch(Exception e) {
             
            JOptionPane.showMessageDialog(null,"No results");
+           
+           System.out.println("Issue with UI");
 
           }
              return model;
@@ -184,7 +205,7 @@
                    
      
     }
-JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptionPane.PLAIN_MESSAGE);
+    JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptionPane.PLAIN_MESSAGE);
     //OBTAIN SELECTED ROW
     JButton btn=new JButton("Get Selected");
     btn.addActionListener(new ActionListener() {
@@ -212,6 +233,7 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
 
   }}catch(Exception e){
     JOptionPane.showMessageDialog(null, "No Query Entered");
+    System.out.println("Issue with UI");
 
   }}
 
@@ -255,7 +277,19 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
         
            
        }
-         
+       
+       public boolean needexpansion(String word, String synonym) {
+         //TAKEN FROM https://stackoverflow.com/questions/8689122/joptionpane-yes-no-options-confirm-dialog-box-issue
+         int dialogButton = JOptionPane.YES_NO_OPTION;
+         int dialogResult = JOptionPane.showConfirmDialog(this, "Would you like to expand the query by adding " + synonym + " to " + word + "?", "Expansion", dialogButton);
+         if(dialogResult == 0) {
+           return true;
+         } else {
+           return false;
+         } 
+       }
+       
+       
        
    
        
@@ -273,7 +307,7 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
        
        private UI(String title) throws HeadlessException {
          super(title);
-         Vanilla.createDictionary();
+         Vanilla.createWordDictionary();
          
          setSize(650, 625);
          setResizable(false);
@@ -316,24 +350,6 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
              
            }}
          });
-         
-         
-         
-         
-         
-         
-         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-         result.setFillsViewportHeight( true );
-         result.getTableHeader().setReorderingAllowed(false);
-         
-         revalidate();
-         repaint();
-         
-         
-         
-         
-         setVisible(true);
-         
        }
        
        
@@ -368,6 +384,7 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
                 }
      }
    };
+   
    collection.addActionListener(cbActionListener);
  }
 }
