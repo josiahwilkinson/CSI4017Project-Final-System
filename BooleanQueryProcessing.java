@@ -56,7 +56,7 @@ class BooleanQueryProcessing {
   }
   
   //  returns a list of lists of strings, each list being the a list of Strings for the AND queries
-  static ArrayList<ArrayList<String>> processQuery(String query, boolean reuters, UI ui) {
+  static ArrayList<ArrayList<String>> processQuery(String query, boolean reuters, String[] stemmingRules, UI ui) {
     
     System.out.println(query);
     
@@ -121,12 +121,15 @@ class BooleanQueryProcessing {
     
     
     
-    
+    //  do stemming
+    stemming(head, stemmingRules);
+      
     
     
     
     //  do query expansion stuff here
     //  use ui
+    synonym(head, ui);
     
     
     
@@ -434,6 +437,68 @@ class BooleanQueryProcessing {
   }
   
   
+  //  adds synonyms with the user's permission
+  /*
+   * NOTE: Due to issues with using WordNet, the synonym functionality is not fully implemented.
+   * However, we thought it best to implement the rest of the algorithm to demonstrate that we understand the concept, even if we could not properly import the WordNet API
+   * Some lines have portions commented out so that the program can run with the missing features
+   */
+  static void synonym(QueryNode node, UI ui) {
+    //  check if node is word
+    if (node.type == -1) {
+      //  check if the word is in the WordNet
+      
+      //  if (ui.wordNet.contains(node.parts.get(0))) {
+      
+        //  ask user if they want to expand the word with the first 5 synonyms
+        String[] words;  //  = ui.wordNet.synonyms(parts.get(0))
+        boolean[] response = new boolean[0];  //  = new boolean[Math.min(5, words.length)];
+        for (int i = 0; i < response.length; i++) {
+          response[i] = false; //  = ui.needexpansion(node.parts.get(0), words[i]);
+        }
+        //  check if any responses are true, and if so, turn Node into an OR node and add words as children (NOT will be preserved)
+        boolean expand = false;
+        for (int i = 0; i < response.length; i++) {
+          if (response[i]) {
+            expand = true;
+            break;
+          }
+        }
+        if (expand) {
+          node.type = 0;  //  set node to OR type
+          node.children.add(new QueryNode(node.parts.get(0)));  //  add word as a child node
+          for (int i = 0; i < response.length; i++) {
+            //  check if user confirmed this specific word
+            if (response[i]) {
+              //  node.children.add(new QueryNode(words[i]));  //  add synonym as a word
+            }
+          }
+        }
+      //  }
+    }
+    else {
+      for (QueryNode child : node.children)
+        synonym(child, ui);
+    }
+  }
+  
+  //  adds stemming for words
+  //  makes all word nodes into OR nodes and adds base word and possible stemmed words as children
+  static void stemming(QueryNode node, String[] stemmingRules) {
+    //  check if node is word
+    if (node.type == -1) {
+      String word = node.parts.get(0);
+      node.type = 0;  //  set node to OR type
+      node.children.add(new QueryNode(word));  //  add word as a child node
+      //  add possible stems as children
+      for (int j = 0; j < stemmingRules.length; j += 2) {
+        if (word.length() > stemmingRules[j].length()) {  //  check if within length
+          if (word.substring(word.length()-stemmingRules[j].length(), word.length()).equals(stemmingRules[j]))  //  check for matching ending
+            node.children.add(new QueryNode(word.substring(0, word.length()-stemmingRules[j].length())+stemmingRules[j+1]));  //  add new wordPosting with same posting position
+        }
+      }
+    }
+  }
 }
 
 class QueryNode {

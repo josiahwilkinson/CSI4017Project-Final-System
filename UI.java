@@ -8,7 +8,19 @@
      import java.util.ArrayList;
      import java.awt.event.ActionListener;
      import java.awt.event.ActionEvent;
+     
+     /*
+     package net.didion.jwnl;
+     package net.didion.jwnl.*;
+     package net.didion.jwnl.dictionary;
+
+     import java.net.didion.jwnl;
+     import net.didion.jwnl;
+     import net.didion.jwnl.dictionary;
+     import net.didion.jwnl.*;
+     */
    
+     
      public class UI extends JFrame {
       
 
@@ -43,16 +55,18 @@
          SpellCorrector correct= new SpellCorrector(Vanilla.dictionary);
          DefaultTableModel model = new DefaultTableModel();
          model.addColumn("Titles");
-
+         
          //  create WordNet
-         JWNL.initialize();
+         //  JWNL.initialize();
+//  create database jwnl;
+//  java -cp jwnl.jar;utilities.jar;commons-logging.jar net.didion.jwnl.utilities.DictionaryToDatabase .\include\file-properties.xml .\include\create.sql com.mysql.jdbc.Driver jdbc:mysql://localhost/jwnl?user=jwnl&password=jwnl"
          //Dictionary.getInstance();
          
-        
+         
          try {
-         if(type==1){
+           if(type==1){
            
-           ArrayList<ArrayList<String>>list=Vanilla.booleanQueryProcessing.processQuery(info,reuters, this);
+           ArrayList<ArrayList<String>>list=Vanilla.booleanQueryProcessing.processQuery(info,reuters, Vanilla.stemmingRules, this);
           listnew=Vanilla.condense(list);
            for(String word:listnew){
             
@@ -75,7 +89,7 @@
            
             search.setText(info); 
             
-            index=Vanilla.booleanSearchWithQuery(info,reuters,this);
+            index=Vanilla.booleanSearchWithQuery(info,reuters, Vanilla.stemmingRules,this);
            
             for(int i:index) {
                 if(reuters){
@@ -89,7 +103,7 @@
         
            
          }else if(type==0){
-           String[] list=Vanilla.vectorQueryProcessing.processQuery(info, this);
+           String[] list=Vanilla.vectorQueryProcessing.processQuery(info, Vanilla.stemmingRules, this);
          
            for(String word:list){
             
@@ -110,7 +124,7 @@
               
      }
             search.setText(info); 
-            index=Vanilla.vectorSearchWithQuery(info,reuters,this);
+            index=Vanilla.vectorSearchWithQuery(info,reuters, Vanilla.stemmingRules,this);
   
              for(int i:index) {
               if(reuters){
