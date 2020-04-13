@@ -110,7 +110,7 @@ class VanillaSystem {
   //  an entered query is turned into queries and then queried on the dictionary to turn back relevent pages (array of the document IDs)
   static int[] booleanSearchWithQuery(String query, boolean reuters) {  //  if reuters is true, use the reuters dictionary and documents; otherwise, use the uottawa classes) {
     //  get queries
-    ArrayList<ArrayList<String>> queries = booleanQueryProcessing.processQuery(query);
+    ArrayList<ArrayList<String>> queries = booleanQueryProcessing.processQuery(query, reuters);
     
     //  resulting docs
     ArrayList<Integer> docs = new ArrayList<Integer>();

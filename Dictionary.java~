@@ -17,12 +17,30 @@ class Dictionary {
   static char[] punctuation;
   
   
-  static ArrayList<DictionaryWord> words = new ArrayList<DictionaryWord>();
+  static String[] stopWords = {"a", "about", "above", "after", "again", "against", "ain", "all", "am", "an", "and", "any", "are", "aren", "aren't", "as", "at", "be", "because", "been",
+    "before", "being", "below", "between", "both", "but", "by", "can", "couldn", "couldn't", "d", "did", "didn", "didn't", "do", "does", "doesn", "doesn't",
+    "doing", "don", "don't", "down", "during", "each", "few", "for", "from", "further", "had", "hadn", "hadn't", "has", "hasn", "hasn't", "have", "haven",
+    "haven't", "having", "he", "her", "here", "hers", "herself", "him", "himself", "his", "how", "i", "if", "in", "into", "is", "isn", "isn't", "it", "it's",
+    "its", "itself", "just", "ll", "m", "ma", "me", "mightn", "mightn't", "more", "most", "mustn", "mustn't", "my", "myself", "needn", "needn't", "no", "nor",
+    "not", "now", "o", "of", "off", "on", "once", "only", "or", "other", "our", "ours", "ourselves", "out", "over", "own", "re", "s", "same", "shan", "shan't",
+    "she", "she's", "should", "should've", "shouldn", "shouldn't", "so", "some", "such", "t", "than", "that", "that'll", "the", "their", "theirs", "them",
+    "themselves", "then", "there", "these", "they", "this", "those", "through", "to", "too", "under", "until", "up", "ve", "very", "was", "wasn", "wasn't",
+    "we", "were", "weren", "weren't", "what", "when", "where", "which", "while", "who", "whom", "why", "will", "with", "won", "won't", "wouldn", "wouldn't",
+    "y", "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves", "could", "he'd", "he'll", "he's", "here's", "how's", "i'd",
+    "i'll", "i'm", "i've", "let's", "ought", "she'd", "she'll", "that's", "there's", "they'd", "they'll", "they're", "they've", "we'd", "we'll", "we're", "we've",
+    "what's", "when's", "where's", "who's", "why's", "would"};
   
+  
+  //  static ArrayList<DictionaryWord> words = new ArrayList<DictionaryWord>();
+  
+  static HashMap<String, DictionaryWord> reutersDictionaryMap = new HashMap<String, DictionaryWord>();
+  static HashMap<String, DictionaryWord> uottawaDictionaryMap = new HashMap<String, DictionaryWord>();
+  
+  static ArrayList<ProperDocument> reutersDocumentList = new ArrayList<ProperDocument>();
+  static ArrayList<ProperDocument> uottawaDocumentList = new ArrayList<ProperDocument>();
   
   public static void main(String args[]) {
-    ProperDocument[] documents = new ProperDocument[0];
-    createDictionary(documents);
+    createDictionary();
   }
   
   
@@ -33,19 +51,25 @@ class Dictionary {
   }
   
   
-  public static ProperDocument[] createDictionary(ProperDocument[] documents) {
-    
-    
+  public static void createDictionary() {
+    createReutersDictionary();
+    createUottawaDictionary();
+  }
+  
+  public static void createReutersDictionary() {
     
     //  preprocessing
     try {
-      //  create arrayList of raw documents (word bags) to be made into a dictionary later
-      ArrayList<RawDocument> rawDocuments = new ArrayList<RawDocument>();
-      
-      RawDocument currentDocument = null;
       
       for (int i = 0; i < 22; i++) {
         System.out.println("Parsing file: " + i);
+        
+        
+        //  create arrayList of raw documents (word bags) to be made into a dictionary later
+        ArrayList<RawDocument> rawDocuments = new ArrayList<RawDocument>();
+        
+        RawDocument currentDocument = null;
+        
         
         File classes;
         if (i < 10)
@@ -71,6 +95,17 @@ class Dictionary {
           
           //  check for new beginning
           if (originalLine.length() > 0) {
+            
+            //  trim * at beginning
+            while(originalLine.length() > 0) {
+              if (originalLine.charAt(0) == '*') {
+                originalLine = originalLine.substring(1, originalLine.length()); 
+                line = line.toLowerCase();
+              }
+              else
+                break;
+            }
+            
             if (originalLine.length() > 8) {
               if (originalLine.substring(0, 8).equals("<REUTERS")) {
                 //  get id
@@ -93,55 +128,88 @@ class Dictionary {
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<DATE>")) {
                   currentDocument.addDate(originalLine.substring(6, originalLine.length()-7));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(6, originalLine.length()-7)));
+                  currentDocument.addWords(wordsFromLine(line.substring(6, originalLine.length()-7)));
+                }
+              }
+              
+              //  title
+              if (originalLine.length() > 6) {
+                if (originalLine.substring(0, 6).equals("<TITLE")) {
+                  
+                  System.out.println("Adding title: " + originalLine);
+                  
+                  //  check for weird "&lt;CDIN>" like inturruption
+                  for (int j = 0; j < originalLine.length()-10; j++) {  //  use a for loop as it can occur more than once
+                    if (originalLine.charAt(j) == '&') {
+                      int end = j;
+                      while (end < originalLine.length()-1) {
+                        if (originalLine.charAt(end) == '>')
+                          break;
+                        else
+                          end++;
+                      }
+                      if (end < originalLine.length()-3) {
+                        originalLine = originalLine.substring(0, j) + originalLine.substring(end+2, originalLine.length());  //  end + 2 becuase there is a space on each side if the "&lt;CDIN>" statement
+                        line = originalLine.toLowerCase();  //  overwrite line
+                      }
+                    }
+                  }
+                  
+                  
+                  currentDocument.addTitle(originalLine.substring(7, originalLine.length()-8));
+                  currentDocument.addWords(wordsFromLine(line.substring(7, originalLine.length()-8)));
+                  if (currentDocument.id == 440 || currentDocument.id == 455 || currentDocument.id == 459)
+                    System.out.println("found title:" + " " + line.substring(7, originalLine.length()-8));
+                  
+                  System.out.println("Added title: " + originalLine);
                 }
               }
               
               //  topics
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<TOPIC")) {
-                  currentDocument.addDate(originalLine.substring(8, originalLine.length()-9));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(8, originalLine.length()-9)));
+                  currentDocument.addTopics(originalLine.substring(8, originalLine.length()-9));
+                  currentDocument.addWords(wordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
               }
               
               //  places
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<PLACE")) {
-                  currentDocument.addDate(originalLine.substring(8, originalLine.length()-9));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(8, originalLine.length()-9)));
+                  currentDocument.addPlaces(originalLine.substring(8, originalLine.length()-9));
+                  currentDocument.addWords(wordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
               }
               
               //  people
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<PEOPL")) {
-                  currentDocument.addDate(originalLine.substring(8, originalLine.length()-9));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(8, originalLine.length()-9)));
+                  currentDocument.addPeople(originalLine.substring(8, originalLine.length()-9));
+                  currentDocument.addWords(wordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
               }
               
               //  orgs
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 5).equals("<ORGS>")) {
-                  currentDocument.addDate(originalLine.substring(6, originalLine.length()-7));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(6, originalLine.length()-7)));
+                  currentDocument.addOrgs(originalLine.substring(6, originalLine.length()-7));
+                  currentDocument.addWords(wordsFromLine(line.substring(6, originalLine.length()-7)));
                 }
               }
               
               //  exchanges
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<EXCHA")) {
-                  currentDocument.addDate(originalLine.substring(11, originalLine.length()-12));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(11, originalLine.length()-12)));
+                  currentDocument.addExchanges(originalLine.substring(11, originalLine.length()-12));
+                  currentDocument.addWords(wordsFromLine(line.substring(11, originalLine.length()-12)));
                 }
               }
               
               //  companies
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<COMPA")) {
-                  currentDocument.addDate(originalLine.substring(11, originalLine.length()-12));
-                  currentDocument.addWords(RawDocumentWordsFromLine(line.substring(11, originalLine.length()-12)));
+                  currentDocument.addCompanies(originalLine.substring(11, originalLine.length()-12));
+                  currentDocument.addWords(wordsFromLine(line.substring(11, originalLine.length()-12)));
                 }
               }
               
@@ -179,7 +247,25 @@ class Dictionary {
                     }
                   }
                   currentDocument.addDateLine(dateLine);
-                  currentDocument.addWords(RawDocumentWordsFromLine(dateLine));
+                  currentDocument.addWords(wordsFromLine(dateLine));
+                  
+                  
+                  //  check for weird "&lt;CDIN>" like inturruption
+                  for (int j = 0; j < originalLine.length()-10; j++) {  //  use a for loop as it can occur more than once
+                    if (originalLine.charAt(j) == '&') {
+                      int end = j;
+                      while (end < originalLine.length()-1) {
+                        if (originalLine.charAt(end) == '>')
+                          break;
+                        else
+                          end++;
+                      }
+                      if (end != originalLine.length()) {
+                        originalLine = originalLine.substring(0, j) + originalLine.substring(end+2, originalLine.length());  //  end + 2 becuase there is a space on each side if the "&lt;CDIN>" statement
+                        line = originalLine.toLowerCase();  //  overwrite line
+                      }
+                    }
+                  }
                   
                   //  get text body
                   //  first line
@@ -191,13 +277,29 @@ class Dictionary {
                   line = line.toLowerCase();
                   lineCounter++;
                   
-                  //  offset counter for word postings
-                  int offset = 0;
+                  //  add words
                   while(!originalLine.equals("</REUTERS>")) {
-                    if (!line.equals("")) {
+                    if (!line.equals("") && !line.equals(" Reuter") && !line.equals("&#3;</BODY></TEXT>") && !line.equals("Reuter &#3;</BODY></TEXT>")) {  //  don't use the weird lines that are sometimes at the end
+                      
+                      //  check for weird "&lt;CDIN>" like inturruption
+                      for (int j = 0; j < originalLine.length()-10; j++) {  //  use a for loop as it can occur more than once
+                        if (originalLine.charAt(j) == '&') {
+                          int end = j;
+                          while (end < originalLine.length()-1) {
+                            if (originalLine.charAt(end) == '>')
+                              break;
+                            else
+                              end++;
+                          }
+                          if (end != originalLine.length()) {
+                            originalLine = originalLine.substring(0, j) + originalLine.substring(end+2, originalLine.length());  //  end + 2 becuase there is a space on each side if the "&lt;CDIN>" statement
+                            line = originalLine.toLowerCase();  //  overwrite line
+                          }
+                        }
+                      }
+                      
                       currentDocument.addLine(originalLine);
-                      ArrayList<RawDocumentWord> words = RawDocumentWordsFromLine(line, offset);
-                      offset += words.size();
+                      String[] words = wordsFromLine(line);
                       currentDocument.addWords(words);
                     }
                     line = br.readLine();
@@ -216,52 +318,104 @@ class Dictionary {
           //  get next line
           line = br.readLine();
         }
+        
+        
+        
+        System.out.println("checking for titles");
+        for (int j = 0; j < rawDocuments.size(); j++) {
+          //  System.out.println(j+": "+rawDocuments.get(j).title);
+        }
+        System.out.println(493+": "+rawDocuments.get(493).title);
+        System.out.println(454+": "+rawDocuments.get(454).title);
+        System.out.println(458+": "+rawDocuments.get(458).title);
+        
+        
+        
+        System.out.println("Finished creating raw documents");
+        
+        
+        
+        //  too slow, use hashmap
+        //  ArrayList<String> wordList = new ArrayList<String>();
+        
+        //  documents = new ProperDocument[rawDocuments.size()];
+        
+        for (int j = 0; j < rawDocuments.size(); j++) {
+          if (j%100 == 0)
+            System.out.println(j + " " + reutersDocumentList.size() + " " + reutersDictionaryMap.size());
+          //  documents[j] = new ProperDocument(rawDocuments.get(j));
+          ProperDocument pd = new ProperDocument(rawDocuments.get(j));
+          reutersDocumentList.add(pd);
+          //  create dictionary compiling all proper documents
+          addDocument(pd, reutersDictionaryMap);
+        }
+        System.out.println("Finished creating proper documents");
+        
+        
       }
       
       
       
-      System.out.println("Finished creating raw documents");
+      
+      
+      
+      
+      
+      System.out.println("checking for titles");
+      System.out.print("no titles: ");
+      for (int j = 0; j < reutersDocumentList.size(); j++) {
+        if (reutersDocumentList.get(j).title.equals("") || reutersDocumentList.get(j).title.equals(" ") || reutersDocumentList.get(j).title.equals("  "))
+          System.out.print(reutersDocumentList.get(j).id + ", ");
+      }
+      
+      
+      
+      
+      
+      
       
       
       //  print out dictionary
       System.out.println("Finished constructing dictionary");
       System.out.println();
-      //  dictionary.printDictionary();
-      
-      
-      
-      //  too slow, use hashmap
-      //  ArrayList<String> wordList = new ArrayList<String>();
-      
-      HashMap<String, DictionaryWord> dictionaryMap = new HashMap<String, DictionaryWord>();
-      
-      documents = new ProperDocument[rawDocuments.size()];
-      for (int i = 0; i < rawDocuments.size(); i++) {
-        if (i%25 == 0)
-          System.out.println(i +" " + dictionaryMap.size() +" "+ words.size());
-        documents[i] = new ProperDocument(rawDocuments.get(i));
-        //  create dictionary compiling all proper documents
-        
-        addDocument(documents[i], dictionaryMap);
-      }
-      System.out.println("Finished creating proper documents");
-      
-      
+      //  printDictionary();
       
       
       //  set weights for all postings
       System.out.println("adding weights to dictionary");
       System.out.println();
-      for (DictionaryWord word : words) {
-        for (int i = 0; i < documents.length; i++) {
-          if (word.posting(i) != null) {  //  check that there is the posting for the document with this as the id
-            setWeight(word, i);
+      
+      //  for (DictionaryWord word : new ArrayList<DictionaryWord>(reutersDictionaryMap.values())) {
+      //  ArrayList<DictionaryWord> mapCopy = new ArrayList<DictionaryWord>(reutersDictionaryMap.values());
+      ArrayList<String> mapKeyCopy = new ArrayList<String>(reutersDictionaryMap.keySet());
+      for (int k = 0; k < mapKeyCopy.size(); k++) {
+        DictionaryWord word = reutersDictionaryMap.get(mapKeyCopy.get(k));
+        //  status update
+        float total = 10;
+        for (float p = 1; p < total+1; p++) {
+          if ((int)((float)(p*mapKeyCopy.size())/total) == k+1)
+            System.out.println((int)(p*total)+"%");
+        }
+        for (int j = 0; j < reutersDocumentList.size(); j++) {
+          if (word.posting(j) != null) {  //  check that there is the posting for the document with this as the id
+            setWeight(word, j);
           }
         }
       }
+      
       System.out.println("finished adding weights to dictionary");
       System.out.println();
       
+      
+      //  remove stopwords
+      System.out.println("removing stopwords from dictionary");
+      System.out.println();
+      for (String word : stopWords) {
+        if (reutersDictionaryMap.containsKey(word))
+          reutersDictionaryMap.remove(word);
+      }
+      System.out.println("finished removing stopwords");
+      System.out.println();
       
       
       
@@ -274,197 +428,202 @@ class Dictionary {
       System.out.println("Did not work");
       System.out.println(e);
     }
-    
-    
-    
-    
-    /*
-     //  preprocessing
-     try {
-     //  create arrayList of raw documents (word bags) to be made into a dictionary later
-     ArrayList<RawDocument> rawDocuments = new ArrayList<RawDocument>();
-     boolean french = false;  //  turned on if french and ingores lines
-     int positionCounter = 1;  //  required to keep postition of words between document lines (must be 1 as 1 is subtracted)
-     //  read lines
-     //  source: https://stackoverflow.com/questions/5868369/how-to-read-a-large-text-file-line-by-line-using-java
-     File classes = new File("classes.txt");
-     BufferedReader br = new BufferedReader(new FileReader(classes));
-     String line = br.readLine();  //  get first line
-     while (line != null) {
-     //  casefold line
-     String originalLine = line;  //  copy to preserve capitals
-     line = line.toLowerCase();
-     //  process line
-     //  if it detects that the first 3 letters are "adm", "psy", or "mat", it creates a new document starting with that line
-     //  System.out.println(line);
-     if (line.length() > 8)  //  minimum length for course code
-     if (line.substring(0, 3).equals("adm") || line.substring(0, 3).equals("psy") || line.substring(0, 3).equals("mat") || line.substring(0, 3).equals("csi")) {  //  check for course code beginning
-     //  check if english course
-     if (Character.getNumericValue(line.charAt(5)) < 5) {  //  english section
-     rawDocuments.add(new RawDocument(rawDocuments.size(), line.substring(0, 8)));
-     french = false;  //  set french flag to false
-     positionCounter = 1;  //  reset positionCounter
-     }
-     //  course is french
-     else {
-     french = true;  //  turn french flag on
-     }
-     }
-     
-     //  check if currently english
-     if (!french) {
-     //  cut on spaces
-     String[] words = line.split(" ");
-     //  word/posting object
-     ArrayList<RawDocumentWord> wordPostings = new ArrayList<RawDocumentWord>();
-     //  cycle through words
-     for (int i = 0; i < words.length; i++) {
-     if (words[i].length() > 0) {
-     //  System.out.println(words[i]);
-     words[i] = cleanPunctuation(words[i]);  //  remove punctuation from a word
-     //  System.out.println(words[i]);
-     
-     //  now that all punctuation has bben trimmed, save to wordPostings to preserve posting (as positions will be messed up during stemming)
-     wordPostings.add(new RawDocumentWord(words[i], i+positionCounter-1));
-     
-     //  basic phrase recognition for course codes
-     //  check if the word is a course code; if so, check if next is a number and add as phrase; otherwise, disregard
-     boolean courseCode = false;
-     if (words[i].length() == 3) {  //  minimum length for course code
-     if (words[i].equals("adm") || words[i].equals("psy") || words[i].equals("mat") || words[i].equals("csi")) {  //  check for course code beginning
-     //  check if following word is there
-     if (words.length > i+1)
-     //  clean next word
-     words[i+1] = cleanPunctuation(words[i+1]);
-     //  check if next word is a number
-     if (isNumber(words[i+1])) {
-     courseCode = true;  //  set course code flag so as to know not to stem
-     //  add to current word for phrase treatment
-     words[i] += words[i+1];
-     //  wordPostings.get(i).word += words[i+1];  //  modify the word posting as well
-     wordPostings.add(new RawDocumentWord(words[i], i+positionCounter-1));  //  add course code to posting
-     }
-     }
-     }
-     
-     //  else, stem
-     if (!courseCode) {
-     
-     //  stemming
-     for (int j = 0; j < stemmingRules.length; j += 2) {
-     if (words[i].length() > stemmingRules[j].length())  //  check if within length
-     if (words[i].substring(words[i].length()-stemmingRules[j].length(), words[i].length()).equals(stemmingRules[j]))  //  check for matching ending
-     wordPostings.add(new RawDocumentWord(words[i].substring(0, words[i].length()-stemmingRules[j].length())+stemmingRules[j+1], i+positionCounter-1));  //  add new wordPosting with same posting position
-     }
-     }
-     
-     }
-     //  otherwise, if a 0 length word was found (likely some double space or punction turned to nothing), then decrement positionCounter so that it will be skipped in the position counting for posting
-     else {
-     positionCounter--;
-     }
-     }
-     //  send off list of words to raw document
-     rawDocuments.get(rawDocuments.size()-1).addWords(wordPostings);
-     
-     //  add line to document
-     rawDocuments.get(rawDocuments.size()-1).addLine(originalLine);
-     
-     //  add length to position counter
-     positionCounter += words.length;
-     }
-     
-     //  get next line
-     line = br.readLine();
-     }
-     
-     
-     
-     //  all documents have been scanned and stored as RawDocuments with RawDocumentWord word/postings
-     //  now, create proper documents from raw documents (RawDocumentWord to DictionaryWord)
-     documents = new ProperDocument[rawDocuments.size()];
-     for (int i = 0; i < rawDocuments.size(); i++) {
-     documents[i] = new ProperDocument(rawDocuments.get(i));
-     //  create dictionary compiling all proper documents
-     addDocument(documents[i]);
-     }
-     
-     //  print out document 1 (0)
-     //  documents[0].printDocument();
-     
-     System.out.println();
-     System.out.println();
-     
-     //  print out dictionary
-     System.out.println("Finished constructing dictionary");
-     System.out.println();
-     //  dictionary.printDictionary();
-     
-     
-     
-     
-     
-     //  set weights for all postings
-     System.out.println("adding weights to dictionary");
-     System.out.println();
-     for (DictionaryWord word : words) {
-     for (int i = 0; i < documents.length; i++) {
-     if (word.posting(i) != null) {  //  check that there is the posting for the document with this as the id
-     setWeight(word, i);
-     }
-     }
-     }
-     System.out.println("finished adding weights to dictionary");
-     System.out.println();
-     
-     
-     }
-     catch (Exception e) {
-     System.out.println("Did not work");
-     System.out.println(e);
-     }
-     */
-    
-    //  return resulting documents
-    return documents;
   }
   
   
   
-  //  shortcut for non-body lines
-  static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line) {
-    //  System.out.println("HERE 1");
-    //  System.out.println(line);
-    return RawDocumentWordsFromLine(line, 0, false);
-  }
-  //  shortcut for body lines
-  static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line, int offset) {
-    //  System.out.println("HERE 2");
-    //  System.out.println(line);
-    return RawDocumentWordsFromLine(line, offset, true);
-  }
   
-  //  returns an array of RawDocumentWord from the input line
-  static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line, int offset, boolean body) {  //  if the line is from the body, save postings; otherwise, save as -1 (not that postings are actually ever really used)
-    //  check if empty word
-    if (line.equals(""))
-      return null;
-    //  System.out.println("HERE 3");
-    String[] words = wordsFromLine(line);
-    //  System.out.println("HERE 4");
-    ArrayList<RawDocumentWord> rawWords = new ArrayList<RawDocumentWord>();
-    for (int i = 0; i < words.length; i++) {
-      if (!words[i].equals("") && !isNumber(words[i])) {
-        if (body)
-          rawWords.add(new RawDocumentWord(words[i], i+offset));
-        else
-          rawWords.add(new RawDocumentWord(words[i], -1));
+  public static void createUottawaDictionary() {
+    //  preprocessing
+    try {
+      
+      //  create arrayList of raw documents (word bags) to be made into a dictionary later
+      ArrayList<RawDocument> rawDocuments = new ArrayList<RawDocument>();
+      
+      boolean french = false;  //  turned on if french and ingores lines
+      int positionCounter = 1;  //  required to keep postition of words between document lines (must be 1 as 1 is subtracted)
+      //  read lines
+      //  source: https://stackoverflow.com/questions/5868369/how-to-read-a-large-text-file-line-by-line-using-java
+      File classes = new File("classes.txt");
+      BufferedReader br = new BufferedReader(new FileReader(classes));
+      String line = br.readLine();  //  get first line
+      while (line != null) {
+        //  casefold line
+        String originalLine = line;  //  copy to preserve capitals
+        line = line.toLowerCase();
+        //  process line
+        //  if it detects that the first 3 letters are "adm", "psy", or "mat", it creates a new document starting with that line
+        //  System.out.println(line);
+        if (line.length() > 8)  //  minimum length for course code
+          if (line.substring(0, 3).equals("adm") || line.substring(0, 3).equals("psy") || line.substring(0, 3).equals("mat") || line.substring(0, 3).equals("csi")) {  //  check for course code beginning
+          //  check if english course
+          if (Character.getNumericValue(line.charAt(5)) < 5) {  //  english section
+            rawDocuments.add(new RawDocument(rawDocuments.size(), line.substring(0, 8)));
+            french = false;  //  set french flag to false
+            positionCounter = 1;  //  reset positionCounter
+          }
+          //  course is french
+          else {
+            french = true;  //  turn french flag on
+          }
+        }
+        
+        //  check if currently english
+        if (!french) {
+          //  cut on spaces
+          String[] words = line.split(" ");
+          //  word/posting object
+          ArrayList<String> wordPostings = new ArrayList<String>();
+          //  cycle through words
+          for (int i = 0; i < words.length; i++) {
+            if (words[i].length() > 0) {
+              //  System.out.println(words[i]);
+              words[i] = cleanPunctuation(words[i]);  //  remove punctuation from a word
+              //  System.out.println(words[i]);
+              
+              //  now that all punctuation has bben trimmed, save to wordPostings to preserve posting (as positions will be messed up during stemming)
+              wordPostings.add(words[i]);
+              
+              //  basic phrase recognition for course codes
+              //  check if the word is a course code; if so, check if next is a number and add as phrase; otherwise, disregard
+              boolean courseCode = false;
+              if (words[i].length() == 3) {  //  minimum length for course code
+                if (words[i].equals("adm") || words[i].equals("psy") || words[i].equals("mat") || words[i].equals("csi")) {  //  check for course code beginning
+                  //  check if following word is there
+                  if (words.length > i+1)
+                    //  clean next word
+                    words[i+1] = cleanPunctuation(words[i+1]);
+                  //  check if next word is a number
+                  if (isNumber(words[i+1])) {
+                    courseCode = true;  //  set course code flag so as to know not to stem
+                    //  add to current word for phrase treatment
+                    words[i] += words[i+1];
+                    //  wordPostings.get(i).word += words[i+1];  //  modify the word posting as well
+                    wordPostings.add(words[i]);  //  add course code to posting
+                  }
+                }
+              }
+              
+              //  else, stem
+              if (!courseCode) {
+                
+                //  stemming
+                for (int j = 0; j < stemmingRules.length; j += 2) {
+                  if (words[i].length() > stemmingRules[j].length())  //  check if within length
+                    if (words[i].substring(words[i].length()-stemmingRules[j].length(), words[i].length()).equals(stemmingRules[j]))  //  check for matching ending
+                    wordPostings.add(words[i].substring(0, words[i].length()-stemmingRules[j].length())+stemmingRules[j+1]);  //  add new wordPosting with same posting position
+                }
+              }
+              
+            }
+            //  otherwise, if a 0 length word was found (likely some double space or punction turned to nothing), then decrement positionCounter so that it will be skipped in the position counting for posting
+            else {
+              positionCounter--;
+            }
+          }
+          //  send off list of words to raw document
+          rawDocuments.get(rawDocuments.size()-1).addWords(wordPostings);
+          
+          //  add line to document
+          rawDocuments.get(rawDocuments.size()-1).addLine(originalLine);
+          
+          //  add length to position counter
+          positionCounter += words.length;
+        }
+        
+        //  get next line
+        line = br.readLine();
       }
+      
+      
+      
+      //  all documents have been scanned and stored as RawDocuments with RawDocumentWord word/postings
+      //  now, create proper documents from raw documents (RawDocumentWord to DictionaryWord)
+      for (int i = 0; i < rawDocuments.size(); i++) {
+        uottawaDocumentList.add(new ProperDocument(rawDocuments.get(i)));
+        //  create dictionary compiling all proper documents
+        addDocument(uottawaDocumentList.get(uottawaDocumentList.size()-1), uottawaDictionaryMap);
+      }
+      
+      //  print out document 1 (0)
+      //  documents[0].printDocument();
+      
+      System.out.println();
+      System.out.println();
+      
+      //  print out dictionary
+      System.out.println("Finished constructing dictionary");
+      System.out.println();
+      //  dictionary.printDictionary();
+      
+      
+      
+      
+      
+      //  for (DictionaryWord word : new ArrayList<DictionaryWord>(reutersDictionaryMap.values())) {
+      //  ArrayList<DictionaryWord> mapCopy = new ArrayList<DictionaryWord>(reutersDictionaryMap.values());
+      ArrayList<String> mapKeyCopy = new ArrayList<String>(uottawaDictionaryMap.keySet());
+      for (int k = 0; k < mapKeyCopy.size(); k++) {
+        DictionaryWord word = uottawaDictionaryMap.get(mapKeyCopy.get(k));
+        //  status update
+        float total = 10;
+        for (float p = 1; p < total+1; p++) {
+          if ((int)((float)(p*mapKeyCopy.size())/total) == k+1)
+            System.out.println((int)(p*total)+"%");
+        }
+        for (int j = 0; j < uottawaDocumentList.size(); j++) {
+          if (word.posting(j) != null) {  //  check that there is the posting for the document with this as the id
+            setWeight(word, j);
+          }
+        }
+      }
+      System.out.println("finished adding weights to dictionary");
+      System.out.println();
+      
+      
     }
-    //  System.out.println("HERE 5");
-    return rawWords;
+    catch (Exception e) {
+      System.out.println("Did not work");
+      System.out.println(e);
+    }
   }
   
+  
+  /*
+   //  shortcut for non-body lines
+   static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line) {
+   //  System.out.println("HERE 1");
+   //  System.out.println(line);
+   return RawDocumentWordsFromLine(line, 0, false);
+   }
+   //  shortcut for body lines
+   static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line, int offset) {
+   //  System.out.println("HERE 2");
+   //  System.out.println(line);
+   return RawDocumentWordsFromLine(line, offset, true);
+   }
+   
+   //  returns an array of RawDocumentWord from the input line
+   static ArrayList<RawDocumentWord> RawDocumentWordsFromLine(String line, int offset, boolean body) {  //  if the line is from the body, save postings; otherwise, save as -1 (not that postings are actually ever really used)
+   //  check if empty word
+   if (line.equals(""))
+   return null;
+   //  System.out.println("HERE 3");
+   String[] words = wordsFromLine(line);
+   //  System.out.println("HERE 4");
+   ArrayList<RawDocumentWord> rawWords = new ArrayList<RawDocumentWord>();
+   for (int i = 0; i < words.length; i++) {
+   if (!words[i].equals("") && !isNumber(words[i])) {
+   if (body)
+   rawWords.add(new RawDocumentWord(words[i], i+offset));
+   else
+   rawWords.add(new RawDocumentWord(words[i], -1));
+   }
+   }
+   //  System.out.println("HERE 5");
+   return rawWords;
+   }
+   */
   
   //  takes a line of text and returns the words
   static String[] wordsFromLine(String line) {
@@ -531,60 +690,55 @@ class Dictionary {
   
   
   //  integrates the Proper document into the dictionary
-  static void addDocument(ProperDocument doc,  HashMap<String, DictionaryWord> dictionaryMap) {
+  static void addDocument(ProperDocument doc, HashMap<String, DictionaryWord> dictionaryMap) {
     //  scan all dictionary words in doc
-    for (DictionaryWord docWord : doc.words) {
+    //  for (DictionaryWord docWord : doc.words) {
+    for (int i = 0; i < doc.words.size(); i++) {
       //  too slow, use hashmap
       /*
-      //  check for matching word in dictionary
-      if (wordList.contains(docWord)) {
-        int position = wordList.indexOf(docWord);
-        words.get(position).addPosting(docWord.postings.get(0));
-      }
-      //  if match could not be found, add (shallow copy of) word to dictionary
-      else {
-        DictionaryWord dw = new DictionaryWord(docWord.word);
-        dw.addPosting(docWord.postings.get(0));  //  can do 0 as each document only has 1 posting (containing 1+ positions)
-        words.add(dw);
-        wordList.add(docWord.word);
-      }
-      */
+       //  check for matching word in dictionary
+       if (wordList.contains(docWord)) {
+       int position = wordList.indexOf(docWord);
+       words.get(position).addPosting(docWord.postings.get(0));
+       }
+       //  if match could not be found, add (shallow copy of) word to dictionary
+       else {
+       DictionaryWord dw = new DictionaryWord(docWord.word);
+       dw.addPosting(docWord.postings.get(0));  //  can do 0 as each document only has 1 posting (containing 1+ positions)
+       words.add(dw);
+       wordList.add(docWord.word);
+       }
+       */
       
       //  check for matching word in dictionary
-      if (dictionaryMap.containsKey(docWord.word))
-        dictionaryMap.get(docWord.word).addPosting(docWord.postings.get(0));
+      if (dictionaryMap.containsKey(doc.words.get(i).word)) {
+        dictionaryMap.get(doc.words.get(i).word).addPosting(doc.words.get(i).postings.get(0));
+        doc.words.add(i, dictionaryMap.get(doc.words.get(i).word));  //  add DictionaryWord object as reference so as to free up memory
+        doc.words.remove((i+1));  //  remove old DictionaryWord object so as to free up memory
+      }
       //  otherwise, add it
       else {
-        DictionaryWord dw = new DictionaryWord(docWord.word);
-        dictionaryMap.put(docWord.word, dw);
-        dw.addPosting(docWord.postings.get(0));
-        words.add(dw);
+        DictionaryWord dw = new DictionaryWord(doc.words.get(i).word);
+        dictionaryMap.put(doc.words.get(i).word, dw);
+        dw.addPosting(doc.words.get(i).postings.get(0));
+        doc.words.add(i, dw);  //  change DictionaryWord object into reference so as to free up memory
+        doc.words.remove((i+1));  //  remove old DictionaryWord object so as to free up memory
+        //  words.add(dw);
       }
     }
-  }
-  
-  //  returns true if the dictionary contains the input word
-  boolean hasWord(String w) {
-    for (DictionaryWord word : words) {
-      if (word.word.equals(w))
-        return true;
-    }
-    return false;
   }
   
   //  returns the DictionaryWord matching the input word
-  DictionaryWord getWord(String w) {
-    for (DictionaryWord word : words) {
-      if (word.word.equals(w))
-        return word;
-    }
+  DictionaryWord getWord(String w, HashMap<String, DictionaryWord> dictionaryMap) {
+    if (dictionaryMap.containsKey(w))
+      return dictionaryMap.get(w);
     return null;
   }
   
   //  prints the dictionary to the console
-  void printDictionary() {
+  static void printDictionary() {
     System.out.println("Dictionary:");
-    for (DictionaryWord word : words) {
+    for (DictionaryWord word : new ArrayList<DictionaryWord>(reutersDictionaryMap.values())) {
       System.out.println();
       System.out.print(word.word + " || ");
       for (Posting posting : word.postings) {
@@ -607,7 +761,7 @@ class Dictionary {
   
   
   static float inverseDocumentFrequency(DictionaryWord word) {
-    return (float)(Math.log(words.size()/word.totalDocuments()));
+    return (float)(Math.log(reutersDictionaryMap.size()/word.totalDocuments()));
   }
   
   static float termFrequency(DictionaryWord word, int docID) {

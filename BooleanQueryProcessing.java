@@ -23,6 +23,7 @@ class BooleanQueryProcessing {
      processQuery("(Thing OR Something OR Other) AND (This OR That) AND Others");
      processQuery("(Thing OR Something OR Other) AND (This OR (That AND (True OR False)))");
      */
+    /*
     printQueries(processQuery("A AND NOT (B AND NOT (C OR D))"));
     processQuery("A AND NOT (B AND NOT (C AND D))");
     processQuery("(Thing OR Something OR Other) AND (This OR (That AND (True OR False)))");
@@ -51,10 +52,11 @@ class BooleanQueryProcessing {
     System.out.println();
     System.out.println();
     printQueries(processQuery("(query AND processing)"));
+    */
   }
   
   //  returns a list of lists of strings, each list being the a list of Strings for the AND queries
-  static ArrayList<ArrayList<String>> processQuery(String query) {
+  static ArrayList<ArrayList<String>> processQuery(String query, boolean reuters) {
     
     System.out.println(query);
     
@@ -110,7 +112,10 @@ class BooleanQueryProcessing {
     
     
     //  Check all words here for a * and replace them with an OR with all possibilities as under them
-    wildcard(head);
+      ArrayList<String> mapKeyCopy = new ArrayList<String>(dictionary.reutersDictionaryMap.keySet());
+    if (!reuters)
+      mapKeyCopy = new ArrayList<String>(dictionary.uottawaDictionaryMap.keySet());;
+    wildcard(head, mapKeyCopy);
     
     
     
@@ -316,13 +321,12 @@ class BooleanQueryProcessing {
   //  rewrite with bigram indexing
   
   //  wildcard management
-  static void wildcard(QueryNode node) {
-    /*
+  static void wildcard(QueryNode node, ArrayList<String> dictionaryWords) {
     //  AND or OR node
     //  if (node.type != -1) {
       //  call function on children
       for (QueryNode child : node.children) {
-        wildcard(child);
+        wildcard(child, dictionaryWords);
       }
     //  }
     //  otherwise, operate on word
@@ -377,8 +381,7 @@ class BooleanQueryProcessing {
           //  set word part
           word = word.substring(1, word.length());
 //  search dictionary for ending and add as children
-          for (DictionaryWord w : dictionary.words) {
-            String dword = w.word;
+          for (String dword : dictionaryWords) {
             if (dword.length() > word.length()) {  //  check length
               if (dword.substring(dword.length()-word.length(), dword.length()).equals(word)) {
                 if (not)
@@ -394,8 +397,7 @@ class BooleanQueryProcessing {
           //  set word part
           word = word.substring(0, word.length()-1);
 //  search dictionary for ending and add as children
-          for (DictionaryWord w : dictionary.words) {
-            String dword = w.word;
+          for (String dword : dictionaryWords) {
             if (dword.length() > word.length()) {  //  check length
               if (dword.substring(0, word.length()).equals(word)) {
                 if (not)
@@ -412,8 +414,7 @@ class BooleanQueryProcessing {
           String wordA = word.substring(0, spot);
           String wordB = word.substring(spot+1, word.length());
 //  search dictionary for ending and add as children
-          for (DictionaryWord w : dictionary.words) {
-            String dword = w.word;
+          for (String dword : dictionaryWords) {
             if (dword.length() > wordA.length()+wordB.length()) {  //  check length
               if (dword.substring(0, wordA.length()).equals(wordA) && dword.substring(dword.length()-wordB.length(), dword.length()).equals(wordB)) {
                 if (not)
@@ -426,7 +427,6 @@ class BooleanQueryProcessing {
         }
       }
     }
-    */
   }
   
   
