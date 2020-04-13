@@ -56,7 +56,7 @@ class BooleanQueryProcessing {
   }
   
   //  returns a list of lists of strings, each list being the a list of Strings for the AND queries
-  static ArrayList<ArrayList<String>> processQuery(String query, boolean reuters) {
+  static ArrayList<ArrayList<String>> processQuery(String query, boolean reuters, UI ui) {
     
     System.out.println(query);
     
@@ -123,6 +123,10 @@ class BooleanQueryProcessing {
     
     
     
+    
+    
+    //  do query expansion stuff here
+    //  use ui
     
     
     

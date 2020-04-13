@@ -48,7 +48,7 @@
          try {
          if(type==1){
            
-           ArrayList<ArrayList<String>>list=Vanilla.booleanQueryProcessing.processQuery(info,reuters);
+           ArrayList<ArrayList<String>>list=Vanilla.booleanQueryProcessing.processQuery(info,reuters, this);
           listnew=Vanilla.condense(list);
            for(String word:listnew){
             
@@ -71,7 +71,7 @@
            
             search.setText(info); 
             
-            index=Vanilla.booleanSearchWithQuery(info,reuters);
+            index=Vanilla.booleanSearchWithQuery(info,reuters,this);
            
             for(int i:index) {
                 if(reuters){
@@ -85,7 +85,7 @@
         
            
          }else if(type==0){
-           String[] list=Vanilla.vectorQueryProcessing.processQuery(info);
+           String[] list=Vanilla.vectorQueryProcessing.processQuery(info, this);
          
            for(String word:list){
             
@@ -106,7 +106,7 @@
               
      }
             search.setText(info); 
-            index=Vanilla.vectorSearchWithQuery(info,reuters);
+            index=Vanilla.vectorSearchWithQuery(info,reuters,this);
   
              for(int i:index) {
               if(reuters){
@@ -256,17 +256,17 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
         
            
        }
-         
-       public boolean needexpansion(){
-        //TAKEN FROM https://stackoverflow.com/questions/8689122/joptionpane-yes-no-options-confirm-dialog-box-issue
-                int dialogButton = JOptionPane.YES_NO_OPTION;
-                int dialogResult = JOptionPane.showConfirmDialog(this, "Would you like to expand the query", "Expansion", dialogButton);
-                if(dialogResult == 0) {
-                  return true;
-                } else {
-                  return false;
-                } 
-}
+       
+       public boolean needexpansion(String word, String synonym) {
+         //TAKEN FROM https://stackoverflow.com/questions/8689122/joptionpane-yes-no-options-confirm-dialog-box-issue
+         int dialogButton = JOptionPane.YES_NO_OPTION;
+         int dialogResult = JOptionPane.showConfirmDialog(this, "Would you like to expand the query by adding " + synonym + " to " + word + "?", "Expansion", dialogButton);
+         if(dialogResult == 0) {
+           return true;
+         } else {
+           return false;
+         } 
+       }
        
        
        
@@ -329,24 +329,6 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
              
            }}
          });
-         
-         
-         
-         
-         
-         
-         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-         result.setFillsViewportHeight( true );
-         result.getTableHeader().setReorderingAllowed(false);
-         
-         revalidate();
-         repaint();
-         
-         
-         
-         
-         setVisible(true);
-         
        }
        
        

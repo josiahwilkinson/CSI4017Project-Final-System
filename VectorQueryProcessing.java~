@@ -9,7 +9,7 @@ class VectorQueryProcessing {
   }
   
   //  returns an array of strings for queries
-  static String[] processQuery(String query, UI ui) {
+  static String[] processQuery(String query) {
     
     System.out.println(query);
     
