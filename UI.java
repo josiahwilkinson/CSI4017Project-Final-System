@@ -180,7 +180,8 @@
                 }else{
                   model.setValueAt(Vanilla.dictionary.uottawaDocumentList.get(index[i]).title,i,1);
 
-                }     
+                }   
+                   
      
     }
 JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptionPane.PLAIN_MESSAGE);
