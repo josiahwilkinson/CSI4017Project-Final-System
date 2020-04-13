@@ -108,9 +108,9 @@ class VanillaSystem {
   
   
   //  an entered query is turned into queries and then queried on the dictionary to turn back relevent pages (array of the document IDs)
-  static int[] booleanSearchWithQuery(String query, boolean reuters, UI ui) {  //  if reuters is true, use the reuters dictionary and documents; otherwise, use the uottawa classes) {
+  static int[] booleanSearchWithQuery(String query, boolean reuters, String[] stemmingRules, UI ui) {  //  if reuters is true, use the reuters dictionary and documents; otherwise, use the uottawa classes) {
     //  get queries
-    ArrayList<ArrayList<String>> queries = booleanQueryProcessing.processQuery(query, reuters, ui);
+    ArrayList<ArrayList<String>> queries = booleanQueryProcessing.processQuery(query, reuters, stemmingRules, ui);
     
     //  resulting docs
     ArrayList<Integer> docs = new ArrayList<Integer>();
@@ -225,9 +225,9 @@ class VanillaSystem {
   
   
   //  an entered query is turned into queries and then queried on the dictionary to turn back relevent pages (array of the document IDs)
-  static int[] vectorSearchWithQuery(String query, boolean reuters, UI ui) {  //  if reuters is true, use the reuters dictionary and documents; otherwise, use the uottawa classes
+  static int[] vectorSearchWithQuery(String query, boolean reuters, String[] stemmingRules, UI ui) {  //  if reuters is true, use the reuters dictionary and documents; otherwise, use the uottawa classes
     //  get queries
-    String[] queries = vectorQueryProcessing.processQuery(query, ui);
+    String[] queries = vectorQueryProcessing.processQuery(query, stemmingRules, ui);
     
     //  set base weight for compare against
     float[] baseVector = new float[queries.length];
