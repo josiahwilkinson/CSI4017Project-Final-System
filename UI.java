@@ -258,8 +258,17 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
        }
          
        public boolean needexpansion(){
-        return true;
-       }
+        //TAKEN FROM https://stackoverflow.com/questions/8689122/joptionpane-yes-no-options-confirm-dialog-box-issue
+                int dialogButton = JOptionPane.YES_NO_OPTION;
+                int dialogResult = JOptionPane.showConfirmDialog(this, "Would you like to expand the query", "Expansion", dialogButton);
+                if(dialogResult == 0) {
+                  return true;
+                } else {
+                  return false;
+                } 
+}
+       
+       
        
    
        
@@ -372,6 +381,7 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
                 }
      }
    };
+   
    collection.addActionListener(cbActionListener);
  }
 }
