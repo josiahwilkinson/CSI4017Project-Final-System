@@ -4,13 +4,13 @@ import java.lang.Math;
 
 
 //  stores a word and postings
-class WordDictionaryWord {
+class DictionaryWord {
   
   String word;
   
   ArrayList<Posting> postings = new ArrayList<Posting>();
   
-  WordDictionaryWord(String w) {
+  DictionaryWord(String w) {
     word = w;
   }
   
@@ -46,14 +46,12 @@ class WordDictionaryWord {
   Posting posting(int id) {
     int index = 0;
     while (index < postings.size()) {
-      if (postings.get(index).docID != id)
-        index++;
+      if (postings.get(index).docID == id)
+        return postings.get(index);
       else
-        break;
+        index++;
     }
-    if (index == postings.size())
-      return null;
-    return postings.get(index);
+    return null;
   }
   
   float termFrequency() {

@@ -116,7 +116,7 @@ class VanillaSystem {
     ArrayList<Integer> docs = new ArrayList<Integer>();
     
     //  get hashmap
-    HashMap<String, WordDictionaryWord> dictionaryMap;
+    HashMap<String, DictionaryWord> dictionaryMap;
     if (reuters)
       dictionaryMap = dictionary.reutersDictionaryMap;
     else
@@ -133,14 +133,14 @@ class VanillaSystem {
         else
           contains.add(word);
       }
-      //  get WordDictionaryWords
-      ArrayList<WordDictionaryWord> includedWords = new ArrayList<WordDictionaryWord>();
+      //  get DictionaryWords
+      ArrayList<DictionaryWord> includedWords = new ArrayList<DictionaryWord>();
       for (String word : contains) {
         includedWords.add(dictionary.getWord(word, dictionaryMap));
         if (includedWords.get(includedWords.size()-1) == null)
           System.out.println("Null found: " + word);
       }
-      ArrayList<WordDictionaryWord> removedWords = new ArrayList<WordDictionaryWord>();
+      ArrayList<DictionaryWord> removedWords = new ArrayList<DictionaryWord>();
       for (String word : not) {
         removedWords.add(dictionary.getWord(word, dictionaryMap));
         if (removedWords.get(removedWords.size()-1) == null)
@@ -148,7 +148,7 @@ class VanillaSystem {
       }
       
       //  search through dictionary words
-      //  to do this, have a tracker for each WordDictionaryWord in both lists. If all of the docs in includeWords match, and all the docs in removedWords are higher, add the doc to the list
+      //  to do this, have a tracker for each DictionaryWord in both lists. If all of the docs in includeWords match, and all the docs in removedWords are higher, add the doc to the list
       int[] dictionaryTrackers = new int[includedWords.size()+removedWords.size()];
       for (int i : dictionaryTrackers)
         i = 0;
@@ -229,6 +229,14 @@ class VanillaSystem {
     //  get queries
     String[] queries = vectorQueryProcessing.processQuery(query, stemmingRules, ui);
     
+    System.out.print("VSM Queries: ");
+    for (String w : queries)
+      System.out.print(w + ", ");
+    System.out.println();
+    
+    System.out.println("reuters: " + reuters);
+    
+    
     //  set base weight for compare against
     float[] baseVector = new float[queries.length];
     for (int i = 0; i < queries.length; i++) {
@@ -237,7 +245,7 @@ class VanillaSystem {
     
     
     //  get hashmap
-    HashMap<String, WordDictionaryWord> dictionaryMap;
+    HashMap<String, DictionaryWord> dictionaryMap;
     if (reuters)
       dictionaryMap = dictionary.reutersDictionaryMap;
     else
@@ -262,7 +270,8 @@ class VanillaSystem {
     //  set the weights for each document for all words
     for (int i = 0; i < documents.size(); i++) {
       for (int j = 0; j < queries.length; j++) {
-        weightVectors[i][j] = dictionary.weight(dictionary.getWord(queries[j], dictionaryMap), i);
+        //  weightVectors[i][j] = dictionary.weight(dictionary.getWord(queries[j], dictionaryMap), i);
+        weightVectors[i][j] = dictionary.weight(dictionaryMap.get(queries[j]), i);
       }
       //  normalize vectors
       //  get total
@@ -293,6 +302,13 @@ class VanillaSystem {
     for (int i = 0; i < results.length; i++) {
       results[i] = weights.get(i).docID;
     }
+    
+    
+    System.out.println("got results: " + results.length);
+    System.out.print("results: ");
+    for (int r : results)
+      System.out.print(r + ", ");
+    System.out.println();
     
     return results;
   }

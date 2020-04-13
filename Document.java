@@ -125,7 +125,7 @@ class ProperDocument {
   
   String dateline;
   
-  ArrayList<WordDictionaryWord> words = new ArrayList<WordDictionaryWord>();
+  ArrayList<DictionaryWord> words = new ArrayList<DictionaryWord>();
   String description;
   
   ProperDocument(RawDocument doc) {
@@ -148,14 +148,14 @@ class ProperDocument {
     //  create single of each
     for (String docWord : doc.words) {
       boolean found = false;
-      for (WordDictionaryWord word : words) {
+      for (DictionaryWord word : words) {
         if (word.word.equals(docWord)) {
           found = true;
           word.postings.get(0).postings++;
         }
       }
       if (!found) {
-        words.add(new WordDictionaryWord(docWord));
+        words.add(new DictionaryWord(docWord));
         words.get(words.size()-1).addPosting(new Posting(id, 1));  //  initialize all postings to have 1 as each word here will be the first encounter
       }
     }
@@ -178,7 +178,7 @@ class ProperDocument {
   //  prints the document to the console
   void printDocument() {
     System.out.println("Document " + id + ":");
-    for (WordDictionaryWord word : words) {
+    for (DictionaryWord word : words) {
       System.out.println();
       System.out.print(word.word + " || ");
       for (Posting posting : word.postings) {

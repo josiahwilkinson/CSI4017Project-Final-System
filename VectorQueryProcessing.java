@@ -12,6 +12,9 @@ class VectorQueryProcessing {
   static String[] processQuery(String query, String[] stemmingRules, UI ui) {
     
     System.out.println(query);
+    System.out.println(stemmingRules == null);
+    System.out.println(stemmingRules.length);
+    System.out.println(ui == null);
     
     String[] queryWords = query.split(" ");
     
@@ -34,15 +37,18 @@ class VectorQueryProcessing {
       }
     }
     
-    
     //  adds synonyms
     for (int i = 0; i < queryWords.length; i++) {
       for (String word : synonym(queryWords[i], ui)) {
         newQueryWords.add(word);
       }
     }
+    
+    queryWords = new String[newQueryWords.size()];
+    for (int i = 0; i < queryWords.length; i++)
+      queryWords[i] = newQueryWords.get(i);
       
-    return (String[])newQueryWords.toArray();
+    return queryWords;
   }
   
   
