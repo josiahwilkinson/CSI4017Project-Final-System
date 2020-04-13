@@ -351,14 +351,12 @@ class WordDictionary {
       
       
       
-      /*
       System.out.println("checking for titles");
       System.out.print("no titles: ");
       for (int j = 0; j < reutersDocumentList.size(); j++) {
         if (reutersDocumentList.get(j).title.equals("") || reutersDocumentList.get(j).title.equals(" ") || reutersDocumentList.get(j).title.equals("  "))
           System.out.print(reutersDocumentList.get(j).id + ", ");
       }
-      */
       
       
       

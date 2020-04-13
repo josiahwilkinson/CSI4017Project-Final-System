@@ -44,7 +44,6 @@ public class UI extends JFrame {
   
   
   
-  
   public static void main(String[] args) {
     new UI("UOttawa Course Finder");
     System.out.println("Created UI");
@@ -90,7 +89,7 @@ public class UI extends JFrame {
         
         search.setText(info); 
         
-        index=Vanilla.booleanSearchWithQuery(info,reuters, Vanilla.stemmingRules,this);
+        index=Vanilla.booleanSearchWithQuery(info,reuters, Vanilla.stemmingRules, this);
         
         for(int i:index) {
           if(reuters){
@@ -125,7 +124,7 @@ public class UI extends JFrame {
           
         }
         search.setText(info); 
-        index=Vanilla.vectorSearchWithQuery(info,reuters, Vanilla.stemmingRules,this);
+        index=Vanilla.vectorSearchWithQuery(info,reuters, Vanilla.stemmingRules, this);
         
         for(int i:index) {
           if(reuters){
@@ -320,6 +319,7 @@ public class UI extends JFrame {
     Table();
     
     System.out.println("Made it 1.1");
+    System.out.println(result.getSelectedRow());
     
     //used from https://stackoverflow.com/questions/10128064/jtable-selected-row-click-event
     result.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
@@ -366,6 +366,18 @@ public class UI extends JFrame {
           
         }}
     });
+    
+    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    result.setFillsViewportHeight( true );
+    result.getTableHeader().setReorderingAllowed(false);
+    
+    revalidate();
+    repaint();
+    
+    
+    
+    
+    setVisible(true);
     
     System.out.println("Made it 5");
   }
