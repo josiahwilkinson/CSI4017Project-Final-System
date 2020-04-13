@@ -58,6 +58,11 @@ class Dictionary {
   
   public static void createReutersDictionary() {
     
+    
+    String originalLine = "";  //  copy to preserve capitals
+    String line;  //  set to lowercase
+
+    
     //  preprocessing
     try {
       
@@ -78,13 +83,13 @@ class Dictionary {
           classes = new File("Reuters21578/reut2-0" + i + ".sgm");
         
         BufferedReader br = new BufferedReader(new FileReader(classes));
-        String line = br.readLine();  //  get first line
+        line = br.readLine();  //  get first line
         
         int lineCounter = 0;
         while (line != null) {
           
           //  casefold line
-          String originalLine = line;  //  copy to preserve capitals
+          originalLine = line;  //  copy to preserve capitals
           line = line.toLowerCase();
           lineCounter++;
           
@@ -135,16 +140,32 @@ class Dictionary {
               //  title
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<TITLE")) {
+                  
+                  //  System.out.println("Adding title: " + originalLine);
+                  
+                  //  check for weird "&lt;CDIN>" like inturruption
+                  for (int j = 0; j < originalLine.length()-10; j++) {  //  use a for loop as it can occur more than once
+                    if (originalLine.charAt(j) == '&' && originalLine.charAt(j+3) == ';') {
+                        originalLine = originalLine.substring(0, j) + originalLine.substring(j+4, originalLine.length());  //  end + 2 becuase there is a space on each side if the "&lt;CDIN>" statement
+                        line = originalLine.toLowerCase();  //  overwrite line
+                    }
+                  }
+                  
+                  
                   currentDocument.addTitle(originalLine.substring(7, originalLine.length()-8));
                   currentDocument.addWords(wordsFromLine(line.substring(7, originalLine.length()-8)));
                   if (currentDocument.id == 440 || currentDocument.id == 455 || currentDocument.id == 459)
                     System.out.println("found title:" + " " + line.substring(7, originalLine.length()-8));
+                  
+                  //  System.out.println("Added title: " + originalLine);
                 }
               }
               
               //  topics
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<TOPIC")) {
+                  originalLine = trimD(originalLine);  //  remove <D> and </D>
+                  line = originalLine.toLowerCase();  //  overwrite line
                   currentDocument.addTopics(originalLine.substring(8, originalLine.length()-9));
                   currentDocument.addWords(wordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
@@ -153,6 +174,8 @@ class Dictionary {
               //  places
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<PLACE")) {
+                  originalLine = trimD(originalLine);  //  remove <D> and </D>
+                  line = originalLine.toLowerCase();  //  overwrite line
                   currentDocument.addPlaces(originalLine.substring(8, originalLine.length()-9));
                   currentDocument.addWords(wordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
@@ -161,6 +184,8 @@ class Dictionary {
               //  people
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<PEOPL")) {
+                  originalLine = trimD(originalLine);  //  remove <D> and </D>
+                  line = originalLine.toLowerCase();  //  overwrite line
                   currentDocument.addPeople(originalLine.substring(8, originalLine.length()-9));
                   currentDocument.addWords(wordsFromLine(line.substring(8, originalLine.length()-9)));
                 }
@@ -169,6 +194,8 @@ class Dictionary {
               //  orgs
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 5).equals("<ORGS>")) {
+                  originalLine = trimD(originalLine);  //  remove <D> and </D>
+                  line = originalLine.toLowerCase();  //  overwrite line
                   currentDocument.addOrgs(originalLine.substring(6, originalLine.length()-7));
                   currentDocument.addWords(wordsFromLine(line.substring(6, originalLine.length()-7)));
                 }
@@ -177,6 +204,8 @@ class Dictionary {
               //  exchanges
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<EXCHA")) {
+                  originalLine = trimD(originalLine);  //  remove <D> and </D>
+                  line = originalLine.toLowerCase();  //  overwrite line
                   currentDocument.addExchanges(originalLine.substring(11, originalLine.length()-12));
                   currentDocument.addWords(wordsFromLine(line.substring(11, originalLine.length()-12)));
                 }
@@ -185,6 +214,8 @@ class Dictionary {
               //  companies
               if (originalLine.length() > 6) {
                 if (originalLine.substring(0, 6).equals("<COMPA")) {
+                  originalLine = trimD(originalLine);  //  remove <D> and </D>
+                  line = originalLine.toLowerCase();  //  overwrite line
                   currentDocument.addCompanies(originalLine.substring(11, originalLine.length()-12));
                   currentDocument.addWords(wordsFromLine(line.substring(11, originalLine.length()-12)));
                 }
@@ -226,6 +257,15 @@ class Dictionary {
                   currentDocument.addDateLine(dateLine);
                   currentDocument.addWords(wordsFromLine(dateLine));
                   
+                  
+                  //  check for weird "&lt;CDIN>" like inturruption
+                  for (int j = 0; j < originalLine.length()-10; j++) {  //  use a for loop as it can occur more than once
+                    if (originalLine.charAt(j) == '&' && originalLine.charAt(j+3) == ';') {
+                        originalLine = originalLine.substring(0, j) + originalLine.substring(j+4, originalLine.length());  //  end + 2 becuase there is a space on each side if the "&lt;CDIN>" statement
+                        line = originalLine.toLowerCase();  //  overwrite line
+                    }
+                  }
+                  
                   //  get text body
                   //  first line
                   String[] parts = originalLine.split("</DATELINE><BODY>");
@@ -238,7 +278,17 @@ class Dictionary {
                   
                   //  add words
                   while(!originalLine.equals("</REUTERS>")) {
-                    if (!line.equals("")) {
+                    if (!line.equals("") && !line.equals(" Reuter") && !line.equals("&#3;</BODY></TEXT>") && !line.equals("Reuter &#3;</BODY></TEXT>")) {  //  don't use the weird lines that are sometimes at the end
+                      
+                      
+                      //  check for weird "&lt;CDIN>" like inturruption
+                      for (int j = 0; j < originalLine.length()-10; j++) {  //  use a for loop as it can occur more than once
+                        if (originalLine.charAt(j) == '&' && originalLine.charAt(j+3) == ';') {
+                          originalLine = originalLine.substring(0, j) + originalLine.substring(j+4, originalLine.length());  //  end + 2 becuase there is a space on each side if the "&lt;CDIN>" statement
+                          line = originalLine.toLowerCase();  //  overwrite line
+                        }
+                      }
+                      
                       currentDocument.addLine(originalLine);
                       String[] words = wordsFromLine(line);
                       currentDocument.addWords(words);
@@ -262,13 +312,13 @@ class Dictionary {
         
         
         
-      System.out.println("checking for titles");
-      for (int j = 0; j < rawDocuments.size(); j++) {
-      //  System.out.println(j+": "+rawDocuments.get(j).title);
-      }
-      System.out.println(493+": "+rawDocuments.get(493).title);
-      System.out.println(454+": "+rawDocuments.get(454).title);
-      System.out.println(458+": "+rawDocuments.get(458).title);
+        System.out.println("checking for titles");
+        for (int j = 0; j < rawDocuments.size(); j++) {
+          //  System.out.println(j+": "+rawDocuments.get(j).title);
+        }
+        System.out.println(493+": "+rawDocuments.get(493).title);
+        System.out.println(454+": "+rawDocuments.get(454).title);
+        System.out.println(458+": "+rawDocuments.get(458).title);
         
         
         
@@ -368,6 +418,8 @@ class Dictionary {
     catch (Exception e) {
       System.out.println("Did not work");
       System.out.println(e);
+      
+      System.out.println("current line: " + originalLine);
     }
   }
   
@@ -450,9 +502,10 @@ class Dictionary {
                 
                 //  stemming
                 for (int j = 0; j < stemmingRules.length; j += 2) {
-                  if (words[i].length() > stemmingRules[j].length())  //  check if within length
+                  if (words[i].length() > stemmingRules[j].length()) {  //  check if within length
                     if (words[i].substring(words[i].length()-stemmingRules[j].length(), words[i].length()).equals(stemmingRules[j]))  //  check for matching ending
-                    wordPostings.add(words[i].substring(0, words[i].length()-stemmingRules[j].length())+stemmingRules[j+1]);  //  add new wordPosting with same posting position
+                      wordPostings.add(words[i].substring(0, words[i].length()-stemmingRules[j].length())+stemmingRules[j+1]);  //  add new wordPosting with same posting position
+                  }
                 }
               }
               
@@ -507,7 +560,7 @@ class Dictionary {
       for (int k = 0; k < mapKeyCopy.size(); k++) {
         DictionaryWord word = uottawaDictionaryMap.get(mapKeyCopy.get(k));
         //  status update
-        float total = 20;
+        float total = 10;
         for (float p = 1; p < total+1; p++) {
           if ((int)((float)(p*mapKeyCopy.size())/total) == k+1)
             System.out.println((int)(p*total)+"%");
@@ -569,11 +622,28 @@ class Dictionary {
   //  takes a line of text and returns the words
   static String[] wordsFromLine(String line) {
     String[] words = line.split(" ");
+    ArrayList<String> wardVariations = new ArrayList<String>();
     for (int i = 0; i < words.length; i++) {
       if (!words[i].equals("")) {
+        //  clean word
         words[i] = cleanPunctuation(words[i]);
+        //  stemming
+        for (int j = 0; j < stemmingRules.length; j += 2) {
+          if (words[i].length() > stemmingRules[j].length()) {  //  check if within length
+            if (words[i].substring(words[i].length()-stemmingRules[j].length(), words[i].length()).equals(stemmingRules[j]))  //  check for matching ending
+              wardVariations.add(words[i].substring(0, words[i].length()-stemmingRules[j].length())+stemmingRules[j+1]);  //  add new wordPosting with same posting position
+          }
+        }
       }
     }
+    
+    //  combine lists
+    String[] newWords = new String[words.length+wardVariations.size()];
+    for (int i = 0; i < words.length; i++)
+      newWords[i] = words[i];
+    for (int i = words.length; i < wardVariations.size(); i++)
+      newWords[i] = wardVariations.get(i-words.length);
+    
     return words;
   }
   
@@ -598,6 +668,22 @@ class Dictionary {
       s = s.substring(1, s.length());
     //  return result
     return s;
+  }
+  
+  
+  //  removes <D> and </D> from the input string and returns it
+  static String trimD(String line) {
+    String[] parts = line.split("<D>");
+    line = parts[0];
+    for (int i = 1; i < parts.length; i++)
+      line += " " + parts[i];
+    
+    parts = line.split("</D>");
+    line = parts[0];
+    for (int i = 1; i < parts.length; i++)
+      line += " " + parts[i];
+    
+    return line;
   }
   
   

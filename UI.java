@@ -48,7 +48,7 @@
          try {
          if(type==1){
            
-           ArrayList<ArrayList<String>>list=Vanilla.booleanQueryProcessing.processQuery(info);
+           ArrayList<ArrayList<String>>list=Vanilla.booleanQueryProcessing.processQuery(info,reuters);
           listnew=Vanilla.condense(list);
            for(String word:listnew){
             
@@ -258,9 +258,7 @@ JOptionPane.showMessageDialog(null,scroll,"Which Documents are relevant ",JOptio
        }
          
        public boolean needexpansion(){
-
-
-        
+        return true;
        }
        
    
