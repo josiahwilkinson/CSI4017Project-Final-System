@@ -141,7 +141,7 @@ import java.util.*;
          
          
      }  
-
+//taken from:http://camposha.info/source/java-jtable-render-checkbox-column/
       public void relevancemodel(){
         try{
     if(index.length!=0){
@@ -198,9 +198,9 @@ int returns=JOptionPane.showOptionDialog(null, scroll, "Which Documents are rele
     //OBTAIN SELECTED ROW
    
    
-    ArrayList<Integer> relevant=new ArrayList<Integer>();
-    ArrayList<Integer> nonrelevant=new ArrayList<Integer>();
-     Relevance thisquery = new Relevance(search.getText(),relevant,nonrelevant);
+    ArrayList<ProperDocument> relevant=new ArrayList<ProperDocument>();
+    ArrayList<ProperDocument> nonrelevant=new ArrayList<ProperDocument>();
+    Relevance thisquery = new Relevance(search.getText(),relevant,nonrelevant,reuters,Vanilla.dictionary);
    
 if(returns==0)
           {
@@ -210,9 +210,19 @@ if(returns==0)
         {
           Boolean checked=Boolean.valueOf(table.getValueAt(i, 0).toString());
           if(checked){
-              relevant.add(index[i]);
+             if(reuters){
+                  relevant.add(Vanilla.dictionary.reutersDocumentList.get(i));
+                }else{
+                  relevant.add(Vanilla.dictionary.uottawaDocumentList.get(i));
+
+                }    
           }else{
-              nonrelevant.add(index[i]);
+             if(reuters){
+                  nonrelevant.add(Vanilla.dictionary.reutersDocumentList.get(i));
+                }else{
+                  nonrelevant.add(Vanilla.dictionary.uottawaDocumentList.get(i));
+
+                } 
           }
 
       } 
