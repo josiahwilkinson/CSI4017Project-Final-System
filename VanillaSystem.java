@@ -333,14 +333,6 @@ class VanillaSystem {
     System.out.println("new Query:");
     for (String word : queryList)
       System.out.print(word + " ");
-    //  overwrite queries and baseWeights
-    queries = new String[queryList.size()];
-    baseVector = new float[queryList.size()];
-    for (int i = 0; i < queryList.size(); i++) {
-      queries[i] = queryList.get(i);
-      baseVector[i] = weightList.get(i);
-    }
-    
     
     //  get hashmap
     HashMap<String, DictionaryWord> dictionaryMap;
@@ -349,12 +341,33 @@ class VanillaSystem {
     else
       dictionaryMap = dictionary.uottawaDictionaryMap;
     
-    //  get hashmap
+    //  get documents
     ArrayList<ProperDocument> documents;
     if (reuters)
       documents = dictionary.reutersDocumentList;
     else
       documents = dictionary.uottawaDocumentList;
+    
+    //  check that all words are in dictionary
+    for (int i = 0; i < queryList.size(); i++) {
+      if(!dictionaryMap.containsKey(queryList.get(i))) {
+        System.out.println("deleting: " + queryList.get(i));
+        //  delete i
+        queryList.remove(i);
+        weightList.remove(i);
+        i--;
+      }
+    }
+    
+    
+    //  overwrite queries and baseWeights
+    queries = new String[queryList.size()];
+    baseVector = new float[queryList.size()];
+    for (int i = 0; i < queryList.size(); i++) {
+      queries[i] = queryList.get(i);
+      baseVector[i] = weightList.get(i);
+    }
+    
     
     //  document weights
     float[][] weightVectors = new float[documents.size()][];
@@ -376,11 +389,30 @@ class VanillaSystem {
       for (int j = 0; j < queries.length; j++) {
         totalLength += weightVectors[i][j]*weightVectors[i][j];
       }
+      
       totalLength = Math.sqrt(totalLength);
+      
+      if (i < 1000) {
+      int counter = 0;
+      int qcounter = 0;
+      while(counter < 20 && qcounter < queries.length) {
+        if (weightVectors[i][qcounter] > 0) {
+          System.out.println("total length : " + (i) + " " + (float)totalLength);
+          System.out.println("weight before: " + weightVectors[i][qcounter]);
+          System.out.println("weight after: " + (weightVectors[i][qcounter]/(float)totalLength));
+          counter++;
+        }
+        qcounter++;
+      }
+      }
+      
+      
+      
       //  divide by total length
       for (int j = 0; j < queries.length; j++) {
          weightVectors[i][j] = weightVectors[i][j]/(float)totalLength;
       }
+      
       
       //  get final weight (dot product)
       //  as the weights of the base are all 1, the dot product is simply the addition of its wieghts
@@ -394,6 +426,8 @@ class VanillaSystem {
     }
     
     Collections.sort(weights);
+    
+    System.out.println("documents found: " + weights.size());
     
     int[] results = new int[Math.min(weights.size(), 15)];
     for (int i = 0; i < results.length; i++) {
