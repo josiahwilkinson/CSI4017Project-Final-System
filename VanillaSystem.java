@@ -392,6 +392,7 @@ class VanillaSystem {
       
       totalLength = Math.sqrt(totalLength);
       
+      /*
       if (i < 1000) {
       int counter = 0;
       int qcounter = 0;
@@ -405,7 +406,7 @@ class VanillaSystem {
         qcounter++;
       }
       }
-      
+      */
       
       
       //  divide by total length
