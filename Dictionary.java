@@ -52,7 +52,7 @@ class WordDictionary {
   
   
   public static void createWordDictionary() {
-    createReutersWordDictionary();
+    //  createReutersWordDictionary();
     createUottawaWordDictionary();
   }
   

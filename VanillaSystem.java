@@ -243,32 +243,49 @@ class VanillaSystem {
     //  add expansion words
     
     float[] resonances = new float[ui.storage.size()];  //  will be used for weight
+    for (int i = 0; i < resonances.length; i++)
+      resonances[i] = 0;
+    
     //  go through relevance storage in the UI
     for (int rw = 0; rw < ui.storage.size(); rw++) {
       Relevance r = ui.storage.get(rw);
+      
+      
+          System.out.println("adding resonance for: " + rw);
+          System.out.println("reuters: " + (r.reuter == reuters));
+          System.out.println("expansionWords: " + r.expansionWords.length);
+          
+          
       //  check if right dictionary
       if (r.reuter == reuters) {
         //  find resonance with list (shared / total)
         if (r.expansionWords.length > 0) {
           //  get r words
-          String[] comarisonWords = vectorQueryProcessing.processQuery(r.words, stemmingRules, ui);
+          String[] comparisonWords = vectorQueryProcessing.processQuery(r.words, stemmingRules, ui);
           
           float shared = 0;
           int i = 0;
           int j = 0;
-          while(i < r.expansionWords.length && j < queries.length) {
-            if (r.expansionWords[i].compareTo(queries[j]) == 0) {
+          while(i < comparisonWords.length && j < queries.length) {
+            if (comparisonWords[i].compareTo(queries[j]) == 0) {
               i++;
               j++;
               shared++;
             }
-            else if (r.expansionWords[i].compareTo(queries[j]) > 0)
+            else if (comparisonWords[i].compareTo(queries[j]) > 0)
               j++;
             else
               i++;
           }
-          float total = r.expansionWords.length + queries.length - shared;
+          float total = comparisonWords.length + queries.length - shared;
           resonances[rw] = shared/total;  //  will be used for weights
+          
+          
+          System.out.println("shared: " + shared);
+          System.out.println("total: " + total);
+          System.out.println("resonance is: " + resonances[rw]);
+          
+          
         }
       }
     }
@@ -305,7 +322,24 @@ class VanillaSystem {
         }
       }
     }
+    /*
+    //  display words and weights
+        for (String word : ui.storage.get(i).expansionWords) {
+          queryList.add(word);
+          weightList.add(resonances[i]);  //  add resonance weight as it is just a fraction
+        }
+    */
     
+    System.out.println("new Query:");
+    for (String word : queryList)
+      System.out.print(word + " ");
+    //  overwrite queries and baseWeights
+    queries = new String[queryList.size()];
+    baseVector = new float[queryList.size()];
+    for (int i = 0; i < queryList.size(); i++) {
+      queries[i] = queryList.get(i);
+      baseVector[i] = weightList.get(i);
+    }
     
     
     //  get hashmap
@@ -364,6 +398,7 @@ class VanillaSystem {
     int[] results = new int[Math.min(weights.size(), 15)];
     for (int i = 0; i < results.length; i++) {
       results[i] = weights.get(i).docID;
+      System.out.println(documents.get(weights.get(i).docID).title + " " + weights.get(i).weight);
     }
     
     return results;
