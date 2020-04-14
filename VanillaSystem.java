@@ -4,6 +4,7 @@ import java.io.*;
 import java.io.FileNotFoundException; 
 import java.lang.Math; 
 import java.util.HashMap;
+import java.util.Arrays;
 
 
 class VanillaSystem {
@@ -228,20 +229,83 @@ class VanillaSystem {
   static int[] vectorSearchWithQuery(String query, boolean reuters, String[] stemmingRules, UI ui) {  //  if reuters is true, use the reuters dictionary and documents; otherwise, use the uottawa classes
     //  get queries
     String[] queries = vectorQueryProcessing.processQuery(query, stemmingRules, ui);
-    
-    System.out.print("VSM Queries: ");
-    for (String w : queries)
-      System.out.print(w + ", ");
-    System.out.println();
-    
-    System.out.println("reuters: " + reuters);
-    
-    
+    //  sort query
+    Arrays.sort(queries); 
+
     //  set base weight for compare against
     float[] baseVector = new float[queries.length];
     for (int i = 0; i < queries.length; i++) {
       baseVector[i] = 1;
     }
+    
+    
+    
+    //  add expansion words
+    
+    float[] resonances = new float[ui.storage.size()];  //  will be used for weight
+    //  go through relevance storage in the UI
+    for (int rw = 0; rw < ui.storage.size(); rw++) {
+      Relevance r = ui.storage.get(rw);
+      //  check if right dictionary
+      if (r.reuter == reuters) {
+        //  find resonance with list (shared / total)
+        if (r.expansionWords.length > 0) {
+          //  get r words
+          String[] comarisonWords = vectorQueryProcessing.processQuery(r.words, stemmingRules, ui);
+          
+          float shared = 0;
+          int i = 0;
+          int j = 0;
+          while(i < r.expansionWords.length && j < queries.length) {
+            if (r.expansionWords[i].compareTo(queries[j]) == 0) {
+              i++;
+              j++;
+              shared++;
+            }
+            else if (r.expansionWords[i].compareTo(queries[j]) > 0)
+              j++;
+            else
+              i++;
+          }
+          float total = r.expansionWords.length + queries.length - shared;
+          resonances[rw] = shared/total;  //  will be used for weights
+        }
+      }
+    }
+    
+    //  add words with their weight to the query
+    ArrayList<String> queryList = new ArrayList<String>();
+    ArrayList<Float> weightList = new ArrayList<Float>();
+    //  copy over originals
+    for (String word : queries) {
+      queryList.add(word);
+      weightList.add(new Float(1.0));
+    }
+    //  add relevance expansions
+    for (int i = 0; i < resonances.length; i++) {
+      //  check if they have any weight at all
+      if (resonances[i] > 0) {
+        for (String word : ui.storage.get(i).expansionWords) {
+          queryList.add(word);
+          weightList.add(resonances[i]);  //  add resonance weight as it is just a fraction
+        }
+      }
+    }
+    //  combine same words
+    //  (1.0 - (1.0 - a)*(1.0 - b))
+    for (int i = 0; i < queryList.size()-1; i++) {
+      for (int j = i+1; j < queryList.size(); j++) {
+        //  if the 2 spots have the same word
+        if (queryList.get(i).equals(queryList.get(j))) {
+          weightList.add(i, new Float(1.0 - (1.0 - weightList.get(i))*(1.0 - weightList.get(i))));  //  combine the weight of the 2 positions into i
+          weightList.remove(i+1);  //  remove old value
+          queryList.remove(j);  //  delete j
+          weightList.remove(j);  //  delete j
+          j--;  //  roll back j
+        }
+      }
+    }
+    
     
     
     //  get hashmap
@@ -270,8 +334,7 @@ class VanillaSystem {
     //  set the weights for each document for all words
     for (int i = 0; i < documents.size(); i++) {
       for (int j = 0; j < queries.length; j++) {
-        //  weightVectors[i][j] = dictionary.weight(dictionary.getWord(queries[j], dictionaryMap), i);
-        weightVectors[i][j] = dictionary.weight(dictionaryMap.get(queries[j]), i);
+        weightVectors[i][j] = dictionary.weight(dictionary.getWord(queries[j], dictionaryMap), i) * baseVector[j];  //  get the weight and multiply it by the baseVector (which 1 for regular words but a fraction for expansion words)
       }
       //  normalize vectors
       //  get total
@@ -302,13 +365,6 @@ class VanillaSystem {
     for (int i = 0; i < results.length; i++) {
       results[i] = weights.get(i).docID;
     }
-    
-    
-    System.out.println("got results: " + results.length);
-    System.out.print("results: ");
-    for (int r : results)
-      System.out.print(r + ", ");
-    System.out.println();
     
     return results;
   }
