@@ -368,6 +368,7 @@ class WordDictionary {
       
       //  print out dictionary
       System.out.println("Finished constructing dictionary");
+      System.out.println(reutersDocumentList.size() + " " + reutersDictionaryMap.size());
       System.out.println();
       //  printWordDictionary();
       
